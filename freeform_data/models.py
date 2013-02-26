@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from tastypie.models import create_api_key
+import json
 
 class UserRoles():
     student = "student"
@@ -21,9 +22,9 @@ class GraderTypes():
 class Organization(models.Model):
     #TODO: Add in address info, etc later on
     organization_size = models.IntegerField(default=0)
-    organization_name = models.TextField()
+    organization_name = models.TextField(default="")
     #TODO: Add in billing details, etc later, along with rules on when to ask
-    premium_service_subscriptions = models.TextField()
+    premium_service_subscriptions = models.TextField(default=json.dumps([]))
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -55,13 +56,13 @@ class Problem(models.Model):
     #A course has many problems, and a problem can be used in many courses
     course = models.ManyToManyField(Course)
     #Max scores for one or many targets
-    max_target_scores = models.TextField()
+    max_target_scores = models.TextField(default=json.dumps([1]))
     #If additional numeric predictors are being sent, the count of them
-    number_of_additional_predictors = models.IntegerField()
+    number_of_additional_predictors = models.IntegerField(default=0)
     #Prompt of the problem
-    prompt = models.TextField()
+    prompt = models.TextField(default="")
     #If org has subscriptions to premium feedback models
-    premium_feedback_models = models.TextField()
+    premium_feedback_models = models.TextField(default=json.dumps([]))
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)

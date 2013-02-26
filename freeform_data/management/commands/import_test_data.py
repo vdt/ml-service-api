@@ -43,7 +43,9 @@ class Command(BaseCommand):
             pass
 
         try:
-            .objects.create_user('vik', 'vik@edx.org', 'vik')
+            Organization.objects.get_or_create(
+
+            )
         except:
             #User already exists, but doesn't matter to us
             pass
