@@ -1,3 +1,6 @@
+import sys
+import os
+
 # Django settings for ml_service_api project.
 
 DEBUG = True
@@ -128,6 +131,12 @@ INSTALLED_APPS = (
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+
+syslog_format = ("[%(name)s][env:{logging_env}] %(levelname)s "
+                 "[{hostname}  %(process)d] [%(filename)s:%(lineno)d] "
+                 "- %(message)s").format(
+    logging_env="", hostname="")
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

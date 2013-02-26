@@ -36,8 +36,12 @@ class Command(BaseCommand):
 
         print("Starting import...")
         print("Reading config from file {0}".format(args[0]))
-
-        user=User.objects.get(id=1)
+        try:
+            User.objects.create_user('vik', 'vik@edx.org', 'vik')
+        except:
+            #User already exists, but doesn't matter to us
+            pass
+        user = User.objects.get()
         header_name = "importdata"
 
         prompt = parser.get(header_name, 'prompt')
