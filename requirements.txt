@@ -1,0 +1,7 @@
+django
+mimeparse
+lxml
+dateutil
+pyyaml
+uuid
+django-tastypie

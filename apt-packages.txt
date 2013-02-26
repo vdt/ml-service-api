@@ -1,0 +1,10 @@
+python-virtualenv
+build-essential
+python-dev
+gfortran
+libfreetype6-dev
+libpng12-dev
+libxml2-dev
+libxslt-dev
+libreadline6
+libreadline6-dev
