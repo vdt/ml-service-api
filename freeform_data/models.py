@@ -1,41 +1,5 @@
 from django.db import models
 
-Organization
-Data about the organization that is using this
-Location info
-Size
-Billing details
-Premium service subscriptions (if any)
-User
-Foreign key to organization
-Data about a user in the organization
-Currently teacher or student
-
-EssaySet
-Data about a set of essays
-Maximum allowed score
-Number of additional targets (rubric score points, etc)
-Number of additional numeric predictors (if any)
-Prompt
-Premium additional feedback models to use (ie thesis, coherence, etc)
-Foreign key to organization
-
-Essay
-Foreign key to EssaySet
-Foreign key to a User
-Text of the essay
-Additional numeric predictors (if any)
-Train – boolean indicating whether this is a training essay or a test essay
-
-EssayGrade
-Foreign key to Essay
-Contains the grade assigned to the essay
-The type of grader
-Any feedback the grader had
-Scores on additional targets specified (if any)
-Scores on premium feedback models (if any)
-Foreign key to a user (if teacher graded)
-
 class UserRoles():
     student = "student"
     teacher = "teacher"
@@ -57,27 +21,45 @@ class Organization(models.Model):
     #TODO: Add in billing details, etc later, along with rules on when to ask
     premium_service_subscriptions = models.TextField()
 
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
 class UserProfile(models.Model):
     #TODO: Add in a callback where if user identifies as "administrator", then they can create an organization
     user = models.ForeignKey(User, unique=True, blank=True,null=True)
+    #TODO: Potentially support users being in multiple orgs, but will be complicated
     organization = models.ForeignKey(Organization)
     #Add in userinfo here.  Location, etc
     name = models.TextField()
+    #User role in their organization
     role = models.CharField(max_length=20)
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
 
 class Course(models.Model):
     #A user can have many courses, and a course can have many users
     users = models.ManyToManyField(UserProfile)
+    #Each course has a name!
     course_name = models.TextField()
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
 class Problem(models.Model):
     course = models.ForeignKey(Course)
     #Max scores for one or many targets
     max_target_scores = model.TextField()
+    #If additional numeric predictors are being sent, the count of them
     number_of_additional_predictors = models.IntegerField()
+    #Prompt of the problem
     prompt = models.TextField()
     #If org has subscriptions to premium feedback models
     premium_feedback_models = models.TextField()
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
 class Essay(models.Model):
     #Each essay is written for a specific problem
@@ -90,6 +72,9 @@ class Essay(models.Model):
     additional_predictors = models.TextField()
     #The type of essay
     essay_type = models.CharField(max_length=20)
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
 class EssayGrade(models.Model):
     #Each essaygrade is for a specific essay
@@ -108,6 +93,9 @@ class EssayGrade(models.Model):
     success = models.BooleanField()
     #For peer grading and staff grading, we will use this
     user = models.ForeignKey(UserProfile,blank=True,null=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
 
 
