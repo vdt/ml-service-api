@@ -41,6 +41,7 @@ class UserProfile(models.Model):
 class Course(models.Model):
     #A user can have many courses, and a course can have many users
     users = models.ManyToManyField(UserProfile)
+    organization = models.ForeignKey(Organization)
     #Each course has a name!
     course_name = models.TextField()
 
@@ -48,7 +49,8 @@ class Course(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
 class Problem(models.Model):
-    course = models.ForeignKey(Course)
+    #A course has many problems, and a problem can be used in many courses
+    course = models.ManyToManyField(Course)
     #Max scores for one or many targets
     max_target_scores = model.TextField()
     #If additional numeric predictors are being sent, the count of them
