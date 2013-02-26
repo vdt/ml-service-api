@@ -1,0 +1,2 @@
+install all requirements in apt-packages.txt
+install all requirements in requirements.txt (highly recommend that you have a virtualenv and use pip)
