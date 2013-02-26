@@ -16,7 +16,7 @@ import sys
 from ConfigParser import SafeConfigParser
 from datetime import datetime
 
-from essay_api.models import Essay, EssaySet, Score, ScoreStatus, EssayState
+from freeform_data.models import Organization
 from django.contrib.auth.models import User
 
 log = logging.getLogger(__name__)
@@ -41,7 +41,15 @@ class Command(BaseCommand):
         except:
             #User already exists, but doesn't matter to us
             pass
-        user = User.objects.get()
+
+        try:
+            .objects.create_user('vik', 'vik@edx.org', 'vik')
+        except:
+            #User already exists, but doesn't matter to us
+            pass
+
+
+        user = User.objects.get(username='vik')
         header_name = "importdata"
 
         prompt = parser.get(header_name, 'prompt')
