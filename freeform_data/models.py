@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 
 class UserRoles():
     student = "student"
@@ -52,7 +54,7 @@ class Problem(models.Model):
     #A course has many problems, and a problem can be used in many courses
     course = models.ManyToManyField(Course)
     #Max scores for one or many targets
-    max_target_scores = model.TextField()
+    max_target_scores = models.TextField()
     #If additional numeric predictors are being sent, the count of them
     number_of_additional_predictors = models.IntegerField()
     #Prompt of the problem
