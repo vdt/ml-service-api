@@ -6,6 +6,7 @@ class UserRoles():
     student = "student"
     teacher = "teacher"
     administrator = "administrator"
+    grader = "grader"
 
 class EssayTypes():
     test = "test"
@@ -30,15 +31,14 @@ class UserProfile(models.Model):
     #TODO: Add in a callback where if user identifies as "administrator", then they can create an organization
     user = models.ForeignKey(User, unique=True, blank=True,null=True)
     #TODO: Potentially support users being in multiple orgs, but will be complicated
-    organization = models.ForeignKey(Organization)
+    organization = models.ForeignKey(Organization, blank=True,null=True)
     #Add in userinfo here.  Location, etc
-    name = models.TextField()
+    name = models.TextField(blank=True,null=True)
     #User role in their organization
-    role = models.CharField(max_length=20)
+    role = models.CharField(max_length=20,blank=True,null=True)
 
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
+    created = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    modified = models.DateTimeField(auto_now=True, blank=True, null=True)
 
 class Course(models.Model):
     #A user can have many courses, and a course can have many users
@@ -106,6 +106,8 @@ def create_user_profile(sender, instance, created, **kwargs):
         profile, created = UserProfile.objects.get_or_create(user=instance)
 
 post_save.connect(create_user_profile, sender=User)
+
+User.profile = property(lambda u: u.get_profile() )
 
 
 
