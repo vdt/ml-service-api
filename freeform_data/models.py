@@ -92,9 +92,22 @@ class Essay(models.Model):
     essay_type = models.CharField(max_length=20)
 
 class EssayGrade(models.Model):
+    #Each essaygrade is for a specific essay
     essay = models.ForeignKey(Essay)
+    #How the essay was scored for numerous targets
     target_scores = models.TextField()
+    #What type of grader graded it
     grader_type = models.CharField(max_length=20)
+    #Feedback from the grader
+    feedback = models.TextField()
+    #Annotated text from the grader
+    annotated_text = models.TextField()
+    #Scores on premium feedback model, if any
+    premium_feedback_scores = models.TextField()
+    #whether or not the grader succeeded
+    success = models.BooleanField()
+    #For peer grading and staff grading, we will use this
+    user = models.ForeignKey(UserProfile,blank=True,null=True)
 
 
 
