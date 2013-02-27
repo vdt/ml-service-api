@@ -12,8 +12,6 @@ from models import CreatedModel
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
-import controller.rubric_functions
-from controller.models import Submission, SubmissionState, Grader
 log=logging.getLogger(__name__)
 
 def create_directory(model_path):
@@ -50,7 +48,6 @@ def get_latest_created_model(problem):
     created_models=CreatedModel.objects.filter(
         problem=problem,
         creation_succeeded=True,
-        creation_finished = True,
     ).order_by("-date_created")[:1]
 
     if created_models.count()==0:
@@ -70,14 +67,13 @@ def check_if_model_started(problem):
     model_started = False
     created_models=CreatedModel.objects.filter(
         problem=problem,
-        creation_started=True
     ).order_by("-date_created")[:1]
 
     if created_models.count()==0:
         return True, model_started, ""
 
     created_model = created_models[0]
-    if created_model.creation_succeeded==False:
+    if created_model.creation_succeeded==False and created_model.creation_started==True:
         model_started = True
 
     return True, model_started, created_model

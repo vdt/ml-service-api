@@ -90,7 +90,7 @@ class Command(BaseCommand):
             essay = Essay(
                 problem = problem,
                 user =user.profile,
-                essay_type = "Narrative",
+                essay_type = "train",
                 essay_text = text[i],
             )
 

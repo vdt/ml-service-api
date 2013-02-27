@@ -10,6 +10,7 @@ import sys
 from statsd import statsd
 import pickle
 from ml_grading.models import CreatedModel
+from ml_grading import ml_grading_util
 
 sys.path.append(settings.ML_PATH)
 import create
@@ -47,9 +48,10 @@ def handle_single_location(problem):
         return False, "Too few too create a model."
     for m in xrange(0,first_len):
         scores = [s[m] for s in essay_grades]
+        max_score = max(scores)
         log.debug("Currently on location {0} in problem {1}".format(m, problem.id))
         #Get paths to ml model from database
-        relative_model_path, full_model_path= ml_grading_util.get_model_path(location,m)
+        relative_model_path, full_model_path= ml_grading_util.get_model_path(problem,m)
         #Get last created model for given location
         transaction.commit_unless_managed()
         success, latest_created_model=ml_grading_util.get_latest_created_model(problem)
@@ -62,32 +64,28 @@ def handle_single_location(problem):
         #Retrain if no model exists, or every 10 graded essays.
         if not success or sub_count_diff>=10:
             #Checks to see if another model creator process has started amodel for this location
-            success, model_started, created_model = ml_grading_util.check_if_model_started(location)
+            success, model_started, created_model = ml_grading_util.check_if_model_started(problem)
 
             #Checks to see if model was started a long time ago, and removes and retries if it was.
             if model_started:
                 now = timezone.now()
                 second_difference = (now - created_model.date_modified).total_seconds()
                 if second_difference > settings.TIME_BEFORE_REMOVING_STARTED_MODEL:
-                    log.error("Model for location {0} started over {1} seconds ago, removing and re-attempting.".format(
+                    log.error("Model for problem {0} started over {1} seconds ago, removing and re-attempting.".format(
                         problem_id, settings.TIME_BEFORE_REMOVING_STARTED_MODEL))
                     created_model.delete()
                     model_started = False
 
             if not model_started:
                 created_model_dict_initial={
+                    'max_score' : max_score,
                     'prompt' : prompt,
-                    'rubric' : rubric,
-                    'location' : location + suffix,
-                    'course_id' : first_sub.course_id,
-                    'submission_ids_used' : json.dumps(ids),
-                    'problem_id' :  first_sub.problem_id,
+                    'problem' : problem,
                     'model_relative_path' : relative_model_path,
                     'model_full_path' : full_model_path,
                     'number_of_essays' : graded_sub_count,
                     'creation_succeeded': False,
                     'creation_started' : True,
-                    'creation_finished' : False,
                     }
                 created_model = CreatedModel(**created_model_dict_initial)
                 created_model.save()
@@ -116,13 +114,12 @@ def handle_single_location(problem):
                     'cv_kappa' : results['cv_kappa'],
                     'cv_mean_absolute_error' : results['cv_mean_absolute_error'],
                     'creation_succeeded': results['success'],
+                    'creation_started' : False,
                     's3_public_url' : results['s3_public_url'],
                     'model_stored_in_s3' : settings.USE_S3_TO_STORE_MODELS,
                     's3_bucketname' : str(settings.S3_BUCKETNAME),
-                    'creation_finished' : True,
                     'model_relative_path' : relative_model_path,
                     'model_full_path' : full_model_path,
-                    'location' : location + suffix,
                     }
 
                 transaction.commit_unless_managed()

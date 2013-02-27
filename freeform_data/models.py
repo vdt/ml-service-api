@@ -77,7 +77,7 @@ class Essay(models.Model):
     essay_text = models.TextField()
     #Schools may wish to send additional predictors (student grade level, etc)
     additional_predictors = models.TextField(default=json.dumps([]))
-    #The type of essay
+    #The type of essay (train or test)  see EssayTypes class
     essay_type = models.CharField(max_length=20)
 
     created = models.DateTimeField(auto_now_add=True)
