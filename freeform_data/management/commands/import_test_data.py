@@ -42,16 +42,22 @@ class Command(BaseCommand):
             #User already exists, but doesn't matter to us
             pass
 
-        try:
-            Organization.objects.get_or_create(
-
-            )
-        except:
-            #User already exists, but doesn't matter to us
-            pass
-
-
         user = User.objects.get(username='vik')
+        organization, created = Organization.objects.get_or_create(
+            organization_name = "edX"
+        )
+
+        course, created = Course.objects.get_or_create(
+            course_name = "edX101"
+        )
+
+        user.profile.organization = organization
+        user.save()
+        course.users.add(user)
+        course.organization = organization
+        course.save()
+
+        """
         header_name = "importdata"
 
         prompt = parser.get(header_name, 'prompt')
@@ -113,3 +119,4 @@ class Command(BaseCommand):
             min(essay_limit, len(text)),
             args[0],
         ))
+        """

@@ -75,7 +75,7 @@ class Essay(models.Model):
     #Each user writes text (their essay)
     essay_text = models.TextField()
     #Schools may wish to send additional predictors (student grade level, etc)
-    additional_predictors = models.TextField()
+    additional_predictors = models.TextField(default=json.dumps([]))
     #The type of essay
     essay_type = models.CharField(max_length=20)
 
@@ -92,9 +92,9 @@ class EssayGrade(models.Model):
     #Feedback from the grader
     feedback = models.TextField()
     #Annotated text from the grader
-    annotated_text = models.TextField()
+    annotated_text = models.TextField(default="")
     #Scores on premium feedback model, if any
-    premium_feedback_scores = models.TextField()
+    premium_feedback_scores = models.TextField(default=json.dumps([]))
     #whether or not the grader succeeded
     success = models.BooleanField()
     #For peer grading and staff grading, we will use this
