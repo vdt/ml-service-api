@@ -53,6 +53,7 @@ def handle_single_problem(problem):
     graded_sub_count = len(essay_text)
     if graded_sub_count < MIN_ESSAYS_TO_TRAIN_WITH:
         return False, "Too few too create a model."
+
     for m in xrange(0,first_len):
         scores = [s[m] for s in essay_grades]
         max_score = max(scores)

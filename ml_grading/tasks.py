@@ -6,7 +6,7 @@ from datetime import timedelta
 from django.conf import settings
 from ml_grading.ml_model_creation import handle_single_problem, MIN_ESSAYS_TO_TRAIN_WITH
 from ml_grading.ml_grader import handle_single_essay
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.db import transaction
 
 log=logging.getLogger(__name__)
