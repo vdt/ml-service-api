@@ -6,3 +6,5 @@ pyyaml
 uuid
 django-tastypie
 south
+django-celery
+celery-with-redis

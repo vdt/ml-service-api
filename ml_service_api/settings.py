@@ -1,5 +1,6 @@
 import sys
 import os
+from path import path
 
 # Django settings for ml_service_api project.
 ROOT_PATH = path(__file__).dirname()
@@ -138,7 +139,8 @@ INSTALLED_APPS = (
     'tastypie',
     'freeform_data',
     'south',
-    'ml_grading'
+    'ml_grading',
+    'djcelery'
 )
 
 # A sample logging configuration. The only tangible logging
@@ -186,3 +188,7 @@ LOGGING = {
 }
 
 AUTH_PROFILE_MODULE = 'freeform_data.UserProfile'
+
+BROKER_URL = 'redis://localhost:6379/0'
+BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'

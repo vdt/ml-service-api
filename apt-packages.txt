@@ -8,3 +8,4 @@ libxml2-dev
 libxslt-dev
 libreadline6
 libreadline6-dev
+redis-server
