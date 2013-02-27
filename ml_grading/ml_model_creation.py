@@ -32,6 +32,13 @@ def handle_single_location(problem):
         error_message = "Problem with an instructor scored essay! {0}".format(essay_grades)
         log.exception(error_message)
         return False, error_message
+    try:
+        essay_text = [et.encode('ascii', 'ignore') for et in essay_text]
+    except:
+        error_message = "Could not correctly encode some submissions: {0}".format(essay_text)
+        log.exception(error_message)
+        return False, error_message
+
     first_len = len(essay_grades[0])
     for i in xrange(0,len(essay_grades)):
         if len(essay_grades[1])!=first_len:
@@ -140,6 +147,7 @@ def handle_single_location(problem):
                     results['success'],
                     results['errors'],
                 ))
+    return True, "Creation succeeded."
 
 def save_model_file(results, save_to_s3):
     success=False

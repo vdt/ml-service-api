@@ -14,6 +14,7 @@ class CreatedModel(models.Model):
     max_score=models.IntegerField()
     prompt=models.TextField()
     problem = models.ForeignKey("freeform_data.Problem")
+    target_number = models.IntegerField(default=0)
 
     #Properties of the model file
     model_relative_path=models.CharField(max_length=CHARFIELD_LEN_LONG)
