@@ -82,6 +82,9 @@ class Essay(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    def get_instructor_scored(self):
+        return self.essaygrade_set.filter(grader_type=GraderTypes.instructor).order_by("-modified")[:1]
+
 class EssayGrade(models.Model):
     #Each essaygrade is for a specific essay
     essay = models.ForeignKey(Essay)
@@ -99,6 +102,8 @@ class EssayGrade(models.Model):
     success = models.BooleanField()
     #For peer grading and staff grading, we will use this
     user = models.ForeignKey(UserProfile,blank=True,null=True)
+    #Confidence value from the grader
+    confidence = models.DecimalField(max_digits=10,decimal_places=9, default=1)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
