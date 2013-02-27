@@ -22,19 +22,19 @@ class OrganizationResource(ModelResource):
         def obj_create(self, bundle, request=None, **kwargs):
             return super(OrganizationResource, self).obj_create(bundle, request, user=request.user)
 
-class UserResource(ModelResource):
+class UserProfileResource(ModelResource):
     class Meta:
-        queryset = User.objects.all()
-        resource_name = 'user'
+        queryset = UserProfile.objects.all()
+        resource_name = 'user_profile'
 
         authorization= Authorization()
         authentication = ApiKeyAuthentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
-            return super(UserResource, self).obj_create(bundle, request, user=request.user)
+            return super(UserProfileResource, self).obj_create(bundle, request, user=request.user)
 
         def apply_authorization_limits(self, request, object_list):
-            return object_list.filter(id=request.user.id)
+            return object_list.filter(user_id=request.user.id)
 
 class CourseResource(ModelResource):
     class Meta:
