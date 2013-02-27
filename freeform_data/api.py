@@ -9,15 +9,25 @@ from tastypie.utils import trailing_slash
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from tastypie.http import HttpGone, HttpMultipleChoices
 from django.db.models import Q
+from tastypie.serializers import Serializer
 
+def default_authorization():
+    return Authorization()
+
+def default_authentication():
+    return Authentication()
+
+def default_serialization():
+    return Serializer(formats=['json', 'jsonp', 'xml', 'yaml', 'html', 'plist'])
 
 class OrganizationResource(ModelResource):
     class Meta:
         queryset = Organization.objects.all()
         resource_name = 'organization'
 
-        authorization= Authorization()
-        authentication = ApiKeyAuthentication()
+        serializer = default_serialization()
+        authorization= default_authorization()
+        authentication = default_authentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
             return super(OrganizationResource, self).obj_create(bundle, request, user=request.user)
@@ -27,8 +37,9 @@ class UserProfileResource(ModelResource):
         queryset = UserProfile.objects.all()
         resource_name = 'user_profile'
 
-        authorization= Authorization()
-        authentication = ApiKeyAuthentication()
+        serializer = default_serialization()
+        authorization= default_authorization()
+        authentication = default_authentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
             return super(UserProfileResource, self).obj_create(bundle, request, user=request.user)
@@ -41,8 +52,9 @@ class CourseResource(ModelResource):
         queryset = Course.objects.all()
         resource_name = 'course'
 
-        authorization= Authorization()
-        authentication = ApiKeyAuthentication()
+        serializer = default_serialization()
+        authorization= default_authorization()
+        authentication = default_authentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
             return super(CourseResource, self).obj_create(bundle, request, user=request.user)
@@ -56,8 +68,9 @@ class ProblemResource(ModelResource):
         queryset = Problem.objects.all()
         resource_name = 'problem'
 
-        authorization= Authorization()
-        authentication = ApiKeyAuthentication()
+        serializer = default_serialization()
+        authorization= default_authorization()
+        authentication = default_authentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
             return super(ProblemResource, self).obj_create(bundle, request, user=request.user)
@@ -72,8 +85,9 @@ class EssayResource(ModelResource):
         queryset = Essay.objects.all()
         resource_name = 'essay'
 
-        authorization= Authorization()
-        authentication = ApiKeyAuthentication()
+        serializer = default_serialization()
+        authorization= default_authorization()
+        authentication = default_authentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
             return super(EssayResource, self).obj_create(bundle, request, user=request.user)
@@ -87,8 +101,9 @@ class EssayGradeResource(ModelResource):
         queryset = EssayGrade.objects.all()
         resource_name = 'essay_grade'
 
-        authorization= Authorization()
-        authentication = ApiKeyAuthentication()
+        serializer = default_serialization()
+        authorization= default_authorization()
+        authentication = default_authentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
             return super(EssayGradeResource, self).obj_create(bundle, request, user=request.user)
