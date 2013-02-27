@@ -67,7 +67,7 @@ class Command(BaseCommand):
 
         user.profile.organization = organization
         user.save()
-        course.users.add(user.profile)
+        course.users.add(user)
         course.save()
 
         problem, created = Problem.objects.get_or_create(
@@ -95,7 +95,7 @@ class Command(BaseCommand):
         for i in range(0, min(essay_limit, len(text))):
             essay = Essay(
                 problem = problem,
-                user =user.profile,
+                user =user,
                 essay_type = "train",
                 essay_text = text[i],
             )

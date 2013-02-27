@@ -45,7 +45,7 @@ class UserProfile(models.Model):
 
 class Course(models.Model):
     #A user can have many courses, and a course can have many users
-    users = models.ManyToManyField(UserProfile)
+    users = models.ManyToManyField(User)
     organization = models.ForeignKey(Organization)
     #Each course has a name!
     course_name = models.TextField()
