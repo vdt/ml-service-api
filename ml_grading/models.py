@@ -7,8 +7,8 @@ CHARFIELD_LEN_LONG = 1024
 
 class CreatedModel(models.Model):
     #When it was created/modified
-    date_modified=models.DateTimeField(auto_now=True)
-    date_created=models.DateTimeField(auto_now_add=True)
+    modified=models.DateTimeField(auto_now=True)
+    created=models.DateTimeField(auto_now_add=True)
 
     #Properties of the problem the model was created with
     max_score=models.IntegerField()

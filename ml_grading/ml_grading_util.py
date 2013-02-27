@@ -49,7 +49,7 @@ def get_latest_created_model(problem, target_number=0):
         problem=problem,
         creation_succeeded=True,
         target_number = target_number,
-    ).order_by("-date_created")[:1]
+    ).order_by("-created")[:1]
 
     if created_models.count()==0:
         return False, "No valid models for location."
@@ -69,7 +69,7 @@ def check_if_model_started(problem, target_number=0):
     created_models=CreatedModel.objects.filter(
         problem=problem,
         target_number=target_number,
-    ).order_by("-date_created")[:1]
+    ).order_by("-created")[:1]
 
     if created_models.count()==0:
         return True, model_started, ""
