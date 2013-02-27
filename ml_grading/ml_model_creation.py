@@ -91,6 +91,13 @@ def handle_single_location(problem):
                 created_model.save()
                 transaction.commit_unless_managed()
 
+                if not isinstance(prompt, basestring):
+                    try:
+                        prompt = str(prompt)
+                    except:
+                        prompt = ""
+                prompt = prompt.encode('ascii', 'ignore')
+
                 results = create.create(essay_text, scores, prompt)
 
                 scores = [int(score_item) for score_item in scores]
