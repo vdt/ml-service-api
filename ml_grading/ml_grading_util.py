@@ -21,7 +21,7 @@ def create_directory(model_path):
 
     return True
 
-def get_model_path(problem, suffix=0):
+def get_model_path(problem, target_number=0):
     """
     Generate a path from a location
     """
@@ -31,13 +31,13 @@ def get_model_path(problem, suffix=0):
     #Ensure that directory exists, create if it doesn't
     create_directory(base_path)
 
-    fixed_location="{0}_{1}".format(problem_id,suffix)
+    fixed_location="{0}_{1}".format(problem_id,target_number)
     fixed_location+="_"+timezone.now().strftime("%Y%m%d%H%M%S")
     full_path=os.path.join(base_path,fixed_location)
     return fixed_location,full_path
 
 
-def get_latest_created_model(problem):
+def get_latest_created_model(problem, target_number=0):
     """
     Gets the current model file for a given location
     Input:
@@ -48,6 +48,7 @@ def get_latest_created_model(problem):
     created_models=CreatedModel.objects.filter(
         problem=problem,
         creation_succeeded=True,
+        target_number = target_number,
     ).order_by("-date_created")[:1]
 
     if created_models.count()==0:
@@ -56,7 +57,7 @@ def get_latest_created_model(problem):
     return True, created_models[0]
 
 
-def check_if_model_started(problem):
+def check_if_model_started(problem, target_number=0):
     """
     Gets the currently active model file for a given location
     Input:
@@ -67,6 +68,7 @@ def check_if_model_started(problem):
     model_started = False
     created_models=CreatedModel.objects.filter(
         problem=problem,
+        target_number=target_number,
     ).order_by("-date_created")[:1]
 
     if created_models.count()==0:

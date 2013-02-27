@@ -18,7 +18,7 @@ import create
 log = logging.getLogger(__name__)
 
 MAX_ESSAYS_TO_TRAIN_WITH = 1000
-MIN_ESSAYS_TO_TRAIN_WITH = 20
+MIN_ESSAYS_TO_TRAIN_WITH = 10
 
 def handle_single_location(problem):
     transaction.commit_unless_managed()
@@ -39,7 +39,7 @@ def handle_single_location(problem):
         log.exception(error_message)
         return False, error_message
 
-    first_len = len(essay_grades[0])
+    first_len = len(json.loads(problem.max_target_scores))
     for i in xrange(0,len(essay_grades)):
         if len(essay_grades[1])!=first_len:
             error_message = "Problem with an instructor scored essay! {0}".format(essay_grades)
@@ -93,6 +93,7 @@ def handle_single_location(problem):
                     'number_of_essays' : graded_sub_count,
                     'creation_succeeded': False,
                     'creation_started' : True,
+                    'target_number' : m,
                     }
                 created_model = CreatedModel(**created_model_dict_initial)
                 created_model.save()

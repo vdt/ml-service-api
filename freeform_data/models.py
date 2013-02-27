@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from tastypie.models import create_api_key
 import json
+from django.db.models.signals import pre_delete
 
 class UserRoles():
     student = "student"
@@ -113,8 +114,18 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile, created = UserProfile.objects.get_or_create(user=instance)
 
+def pre_delete_problem(sender, instance, **kwargs):
+    essays = Essay.objects.filter(problem=instance)
+    essays.delete()
+
+def pre_delete_essay(sender, instance, **kwargs):
+    essay_grades = EssayGrade.objects.filter(essay=instance)
+    essay_grades.delete()
+
 post_save.connect(create_user_profile, sender=User)
-models.signals.post_save.connect(create_api_key, sender=User)
+post_save.connect(create_api_key, sender=User)
+pre_delete.connect(pre_delete_problem,sender=Problem)
+pre_delete.connect(pre_delete_essay,sender=Essay)
 
 User.profile = property(lambda u: u.get_profile() )
 

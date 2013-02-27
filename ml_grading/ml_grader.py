@@ -41,15 +41,11 @@ def handle_single_item(essay):
     #TODO: Handle unicode in student responses properly
     student_response = essay.essay_text.encode('ascii', 'ignore')
 
-    location_suffixes=ml_grading_util.generate_rubric_location_suffixes(subs_graded_by_instructor, grading = True)
+    target_max_scores = json.loads(essay.problem.max_target_scores)
+    target_counts = len(target_max_scores)
 
-    if len(location_suffixes)>0:
-        rubric_scores_complete=True
-        rubric_scores=[]
-
-    for m in xrange(0,len(location_suffixes)):
-        suffix = location_suffixes[m]
-        success, created_model=ml_grading_util.get_latest_created_model(sub.location + suffix)
+    for m in xrange(0,target_count):
+        success, created_model=ml_grading_util.get_latest_created_model(sub.location)
 
         if not success:
             log.debug("Could not identify a valid created model!")

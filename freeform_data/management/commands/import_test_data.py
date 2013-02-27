@@ -86,6 +86,12 @@ class Command(BaseCommand):
             text.append(line_split[0])
             grades.append(line_split[1:])
 
+        max_scores = []
+        for i in xrange(0,len(grades[0])):
+            scores_at_point = [g[i] for g in grades]
+            max_scores.append(max(scores_at_point))
+        problem.max_target_scores = json.dumps(max_scores)
+        problem.save()
         for i in range(0, min(essay_limit, len(text))):
             essay = Essay(
                 problem = problem,
