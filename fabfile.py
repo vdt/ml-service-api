@@ -2,6 +2,7 @@ from __future__ import with_statement
 from fabric.api import local, lcd, run, env, cd, settings, prefix, sudo, shell_env
 from fabric.contrib.console import confirm
 from fabric.operations import put
+from fabric.contrib.files import exists
 
 env.hosts = ['vik@sandbox-service-api-001.m.edx.org']
 #env.key_filename = ''
@@ -12,25 +13,29 @@ def prepare_deployment():
 
 def deploy():
     code_dir = '/opt/wwc/ml-service-api'
+    ml_code_dir = '/opt/wwc/machine-learning'
     up_one_level_dir = '/opt/wwc'
-    remote_ssh_dir = '~/.ssh'
-    local_dir = '~/mitx_all'
+    remote_ssh_dir = '/home/vik/.ssh'
+    local_dir = '/home/vik/mitx_all'
     with lcd(local_dir), settings(warn_only=True):
         with cd(remote_ssh_dir):
             put('service-id_rsa','id_rsa', use_sudo=True)
             put('service-id_rsa.pub','id_rsa.pub', use_sudo=True)
+            sudo('chmod 400 id_rsa')
 
     with settings(warn_only=True):
         sudo('service celery stop')
         sudo('service ml-service-api stop')
-        repo_exists = fabric.contrib.files.exists(code_dir, use_sudo=True)
+        repo_exists = exists(code_dir, use_sudo=True)
         if not repo_exists:
-            up_one_level_exists = fabric.contrib.files.exists(up_one_level_dir, use_sudo=True)
+            sudo('apt-get install git python')
+            up_one_level_exists = exists(up_one_level_dir, use_sudo=True)
             if not up_one_level_exists:
                 sudo('mkdir {0}'.format(up_one_level_dir))
             with cd(up_one_level_dir):
                 #TODO: Insert repo name here
-                run('git clone git@github.com:MITx/service-api.git')
+                run('git clone git@github.com:VikParuchuri/service-api.git')
+                sudo('mv service-api ml-service-api')
         sudo('chown -R vik {0}'.format(up_one_level_dir))
 
     with cd(code_dir), settings(warn_only=True):
