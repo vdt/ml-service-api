@@ -13,6 +13,13 @@ def prepare_deployment():
 def deploy():
     code_dir = '/opt/wwc/ml-service-api'
     up_one_level_dir = '/opt/wwc'
+    remote_ssh_dir = '~/.ssh'
+    local_dir = '~/mitx_all'
+    with lcd(local_dir), settings(warn_only=True):
+        with cd(remote_ssh_dir):
+            put('service-id_rsa','id_rsa', use_sudo=True)
+            put('service-id_rsa.pub','id_rsa.pub', use_sudo=True)
+
     with settings(warn_only=True):
         sudo('chown -R vik {0}'.format(up_one_level_dir))
         sudo('service celery stop')
@@ -44,7 +51,7 @@ def deploy():
             run('python manage.py migrate --settings=ml_service_api.aws --pythonpath={0}'.format(code_dir))
             sudo('chown -R www-data {0}'.format(up_one_level_dir))
 
-    with lcd('~/mitx_all'), settings(warn_only=True):
+    with lcd(local_dir), settings(warn_only=True):
         with cd(up_one_level_dir):
             put('service-auth.json', 'auth.json', use_sudo=True)
             put('service-env.json', 'env.json', use_sudo=True)
