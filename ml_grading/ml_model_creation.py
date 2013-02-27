@@ -15,8 +15,11 @@ import create
 
 log = logging.getLogger(__name__)
 
+MAX_ESSAYS_TO_TRAIN_WITH = 1000
+
 def handle_single_location(problem):
     transaction.commit_unless_managed()
+    prompt = problem.prompt
     essays = problem.essay_set.filter(essay_type="train")
     essay_text = [e['text'] for e in essays.values('text')]
     try:
@@ -32,42 +35,26 @@ def handle_single_location(problem):
             log.exception(error_message)
             return False, error_message
 
+    if len(essay_text)>MAX_ESSAYS_TO_TRAIN_WITH:
+        essay_text = essay_text[:MAX_ESSAYS_TO_TRAIN_WITH]
+        essay_grades = essay_grades[:MAX_ESSAYS_TO_TRAIN_WITH]
+
+    graded_sub_count = len(essay_text)
     for m in xrange(0,first_len):
-        log.debug("Currently on location {0}.  Greater than zero is a rubric item.".format(m))
-        suffix=location_suffixes[m]
+        log.debug("Currently on location {0} in problem {1}".format(m, problem.id))
         #Get paths to ml model from database
-        relative_model_path, full_model_path= ml_grading_util.get_model_path(location + suffix)
+        relative_model_path, full_model_path= ml_grading_util.get_model_path(location,m)
         #Get last created model for given location
         transaction.commit_unless_managed()
-        success, latest_created_model=ml_grading_util.get_latest_created_model(location + suffix)
+        success, latest_created_model=ml_grading_util.get_latest_created_model(problem)
 
         if success:
             sub_count_diff=graded_sub_count-latest_created_model.number_of_essays
         else:
             sub_count_diff = graded_sub_count
 
-        #Retrain if no model exists, or every 5 graded essays.
-        if not success or sub_count_diff>=5:
-
-            combined_data=list(subs_graded_by_instructor.values('student_response', 'id'))
-            text = [str(i['student_response'].encode('ascii', 'ignore')) for i in combined_data]
-            ids=[i['id'] for i in combined_data]
-
-            #TODO: Make queries more efficient
-            #This is for the basic overall score
-            if m==0:
-                scores = [z.get_last_grader().score for z in list(subs_graded_by_instructor)]
-            else:
-                scores=[z[m-1] for z in sub_rubric_scores]
-
-            #Get the first graded submission, so that we can extract metadata like rubric, etc, from it
-            first_sub=subs_graded_by_instructor[0]
-
-            prompt = str(first_sub.prompt.encode('ascii', 'ignore'))
-            rubric = str(first_sub.rubric.encode('ascii', 'ignore'))
-
-            transaction.commit_unless_managed()
-
+        #Retrain if no model exists, or every 10 graded essays.
+        if not success or sub_count_diff>=10:
             #Checks to see if another model creator process has started amodel for this location
             success, model_started, created_model = ml_grading_util.check_if_model_started(location)
 
@@ -77,13 +64,12 @@ def handle_single_location(problem):
                 second_difference = (now - created_model.date_modified).total_seconds()
                 if second_difference > settings.TIME_BEFORE_REMOVING_STARTED_MODEL:
                     log.error("Model for location {0} started over {1} seconds ago, removing and re-attempting.".format(
-                        location + suffix, settings.TIME_BEFORE_REMOVING_STARTED_MODEL))
+                        problem_id, settings.TIME_BEFORE_REMOVING_STARTED_MODEL))
                     created_model.delete()
                     model_started = False
 
             if not model_started:
                 created_model_dict_initial={
-                    'max_score' : first_sub.max_score,
                     'prompt' : prompt,
                     'rubric' : rubric,
                     'location' : location + suffix,

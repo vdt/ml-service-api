@@ -13,7 +13,7 @@ class CreatedModel(models.Model):
     #Properties of the problem the model was created with
     max_score=models.IntegerField()
     prompt=models.TextField()
-    problem_id = models.ForeignKey("freeform_data.models.Problem")
+    problem = models.ForeignKey("freeform_data.models.Problem")
 
     #Properties of the model file
     model_relative_path=models.CharField(max_length=CHARFIELD_LEN_LONG)
