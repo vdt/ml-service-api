@@ -39,7 +39,7 @@ def handle_single_essay(essay):
     target_counts = len(target_max_scores)
 
     target_scores=[]
-    for m in xrange(0,target_count):
+    for m in xrange(0,target_counts):
         success, created_model=ml_grading_util.get_latest_created_model(essay.problem,m)
 
         if not success:
