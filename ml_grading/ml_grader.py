@@ -76,7 +76,9 @@ def handle_single_essay(essay):
         if m==0:
             final_results=results
         if results['success'] == False:
-            final_results['success'] = False
+            error_message = "Unsuccessful grading: {0}".format(results)
+            log.exception(error_message)
+            return False, error_message
         target_scores.append(int(results['score']))
 
     grader_dict = {
@@ -89,13 +91,12 @@ def handle_single_essay(essay):
         'success' :final_results['success'],
         'confidence' : final_results['confidence'],
         }
-    #Create grader object in controller by posting back results
+
+    # Create grader object in controller by posting back results
     essay_grade = EssayGrade(**grader_dict)
     essay_grade.save()
-
-    if final_results['success']:
-        essay.has_been_ml_graded = True
-        essay.save()
+    essay.has_been_ml_graded = True
+    essay.save()
     transaction.commit_unless_managed()
     return True, "Successfully scored!"
 

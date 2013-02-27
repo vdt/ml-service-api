@@ -4,7 +4,7 @@ from celery.task import periodic_task
 from freeform_data.models import Problem, Essay
 from datetime import timedelta
 from django.conf import settings
-from ml_grading.ml_model_creation import handle_single_problem
+from ml_grading.ml_model_creation import handle_single_problem, MIN_ESSAYS_TO_TRAIN_WITH
 from ml_grading.ml_grader import handle_single_essay
 from django.db.models import Q
 from django.db import transaction
@@ -26,7 +26,8 @@ def create_ml_models_single_problem(problem):
 @periodic_task(run_every=timedelta(seconds=settings.TIME_BETWEEN_ML_GRADER_CHECKS))
 def grade_ml():
     transaction.commit_unless_managed()
-    essays = Essay.objects.filter(has_been_ml_graded=False)
+    problems = Problem.objects.filter(essay__has_been_ml_graded=True).annotate(essay_count=Count('essay')).filter(essay_count__gt=MIN_ESSAYS_TO_TRAIN_WITH)
+    essays = Essay.objects.filter(problem__in=problems, has_been_ml_graded=False)
     for essay in essays:
         grade_ml_single_essay(essay)
 
