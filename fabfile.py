@@ -46,7 +46,8 @@ def deploy():
 
     with cd(ml_code_dir), settings(warn_only=True):
         run('git pull')
-    
+        run('python -m nltk.downloader -d /usr/share/nltk_data all')
+
     with cd(code_dir), settings(warn_only=True):
         # With git...
         run('git pull')
