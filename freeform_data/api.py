@@ -67,7 +67,7 @@ class ProblemResource(ModelResource):
 
 class EssayResource(ModelResource):
     essay_grades = fields.ManyToManyField('freeform_data.api.EssayGradeResource', 'essay', full=True)
-    user = fields.ForeignKey(UserResource, 'user')
+    user = fields.ForeignKey(UserProfileResource, 'user')
     class Meta:
         queryset = Essay.objects.all()
         resource_name = 'essay'
@@ -82,7 +82,7 @@ class EssayResource(ModelResource):
             return object_list.filter(user_id=request.user.id)
 
 class EssayGradeResource(ModelResource):
-    user = fields.ForeignKey(UserResource, 'user')
+    user = fields.ForeignKey(UserProfileResource, 'user')
     class Meta:
         queryset = EssayGrade.objects.all()
         resource_name = 'essay_grade'
