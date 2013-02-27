@@ -15,6 +15,7 @@ def deploy():
     code_dir = '/opt/wwc/ml-service-api'
     ml_code_dir = '/opt/wwc/machine-learning'
     up_one_level_dir = '/opt/wwc'
+    database_dir = '/opt/wwc/db'
     remote_ssh_dir = '/home/vik/.ssh'
     local_dir = '/home/vik/mitx_all'
     with lcd(local_dir), settings(warn_only=True):
@@ -41,6 +42,9 @@ def deploy():
         if not ml_repo_exists:
             with cd(up_one_level_dir):
                 run('git clone git@github.com:MITx/machine-learning.git')
+        db_exists = exists(database_dir, use_sudo=True)
+        if not db_exists:
+            sudo('mkdir {0}'.format(database_dir))
 
         sudo('chown -R vik {0}'.format(up_one_level_dir))
 
