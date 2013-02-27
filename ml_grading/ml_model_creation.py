@@ -41,7 +41,7 @@ def handle_single_location(problem):
 
     first_len = len(json.loads(problem.max_target_scores))
     for i in xrange(0,len(essay_grades)):
-        if len(essay_grades[1])!=first_len:
+        if len(essay_grades[i])!=first_len:
             error_message = "Problem with an instructor scored essay! {0}".format(essay_grades)
             log.exception(error_message)
             return False, error_message
@@ -61,7 +61,7 @@ def handle_single_location(problem):
         relative_model_path, full_model_path= ml_grading_util.get_model_path(problem,m)
         #Get last created model for given location
         transaction.commit_unless_managed()
-        success, latest_created_model=ml_grading_util.get_latest_created_model(problem)
+        success, latest_created_model=ml_grading_util.get_latest_created_model(problem,m)
 
         if success:
             sub_count_diff=graded_sub_count-latest_created_model.number_of_essays
@@ -76,7 +76,7 @@ def handle_single_location(problem):
             #Checks to see if model was started a long time ago, and removes and retries if it was.
             if model_started:
                 now = timezone.now()
-                second_difference = (now - created_model.date_modified).total_seconds()
+                second_difference = (now - created_model.modified).total_seconds()
                 if second_difference > settings.TIME_BEFORE_REMOVING_STARTED_MODEL:
                     log.error("Model for problem {0} started over {1} seconds ago, removing and re-attempting.".format(
                         problem_id, settings.TIME_BEFORE_REMOVING_STARTED_MODEL))

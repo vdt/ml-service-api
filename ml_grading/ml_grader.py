@@ -14,7 +14,7 @@ import pickle
 
 log=logging.getLogger(__name__)
 
-from freeform_data.models import Problem, Essay, EssayGrade
+from freeform_data.models import Problem, Essay, EssayGrade, GraderTypes
 
 from ml_grading.models import CreatedModel
 
@@ -31,7 +31,6 @@ RESULT_FAILURE_DICT={'success' : False, 'errors' : 'Errors!', 'confidence' : 0, 
 
 def handle_single_item(essay):
     transaction.commit_unless_managed()
-    success, latest_created_model = ml_grading_util.get_latest_created_model(essay.problem)
     if not success:
         log.error("No model exists yet for problem {0}".format(essay.problem))
         return False
@@ -44,84 +43,60 @@ def handle_single_item(essay):
     target_max_scores = json.loads(essay.problem.max_target_scores)
     target_counts = len(target_max_scores)
 
+    target_scores=[]
     for m in xrange(0,target_count):
-        success, created_model=ml_grading_util.get_latest_created_model(sub.location)
+        success, created_model=ml_grading_util.get_latest_created_model(essay.problem,m)
 
         if not success:
-            log.debug("Could not identify a valid created model!")
-            if m==0:
-                results= RESULT_FAILURE_DICT
-                formatted_feedback="error"
-                status=GraderStatus.failure
-                statsd.increment("open_ended_assessment.grading_controller.call_ml_grader",
-                    tags=["success:False"])
+            error_message = "Could not identify a valid created model!"
+            log.debug(error_message)
+            results= RESULT_FAILURE_DICT
+            formatted_feedback="error"
+            return False, error_message
 
+        #Create grader path from location in submission
+        grader_path = os.path.join(settings.ML_MODEL_PATH,created_model.model_relative_path)
+        model_stored_in_s3=created_model.model_stored_in_s3
+
+        success, grader_data=load_model_file(created_model,use_full_path=False)
+        if success:
+            results = grade.grade(grader_data, student_response)
         else:
+            results=RESULT_FAILURE_DICT
 
-            #Create grader path from location in submission
-            grader_path = os.path.join(settings.ML_MODEL_PATH,created_model.model_relative_path)
-            model_stored_in_s3=created_model.model_stored_in_s3
-
-            success, grader_data=load_model_file(created_model,use_full_path=False)
-            if success:
-                results = grade.grade(grader_data, student_response)
-            else:
-                results=RESULT_FAILURE_DICT
-
-            #If the above fails, try using the full path in the created_model object
-            if not results['success'] and not created_model.model_stored_in_s3:
-                grader_path=created_model.model_full_path
-                try:
-                    success, grader_data=load_model_file(created_model,use_full_path=True)
-                    if success:
-                        results = grade.grade(grader_data, student_response)
-                    else:
-                        results=RESULT_FAILURE_DICT
-                except:
-                    error_message="Could not find a valid model file."
-                    log.exception(error_message)
+        #If the above fails, try using the full path in the created_model object
+        if not results['success'] and not created_model.model_stored_in_s3:
+            grader_path=created_model.model_full_path
+            try:
+                success, grader_data=load_model_file(created_model,use_full_path=True)
+                if success:
+                    results = grade.grade(grader_data, student_response)
+                else:
                     results=RESULT_FAILURE_DICT
-
-            log.debug("ML Grader:  Success: {0} Errors: {1}".format(results['success'], results['errors']))
-            statsd.increment("open_ended_assessment.grading_controller.call_ml_grader",
-                tags=["success:{0}".format(results['success']), 'location:{0}'.format(sub.location)])
-
-            #Set grader status according to success/fail
-            if results['success']:
-                status = GraderStatus.success
-            else:
-                status = GraderStatus.failure
+            except:
+                error_message="Could not find a valid model file."
+                log.exception(error_message)
+                results=RESULT_FAILURE_DICT
 
         if m==0:
             final_results=results
-        elif results['success']==False:
-            rubric_scores_complete = False
-        else:
-            rubric_scores.append(int(results['score']))
-    if len(rubric_scores)==0:
-        rubric_scores_complete=False
+        if results['success'] == False:
+            final_results['success'] = False
+        target_scores.append(int(results['score']))
 
     grader_dict = {
-        'score': int(final_results['score']),
-        'feedback': json.dumps(results['feedback']),
-        'status': status,
-        'grader_id': 1,
-        'grader_type': "ML",
-        'confidence': results['confidence'],
-        'submission_id': sub.id,
-        'errors' : ' ' .join(results['errors']),
-        'rubric_scores_complete' : rubric_scores_complete,
-        'rubric_scores' : json.dumps(rubric_scores),
+        'essay' : essay,
+        'target_scores' : json.dumps(target_scores),
+        'grader_type' : GraderTypes.machine,
+        'feedback' : '',
+        'annotated_text' : '',
+        'premium_feedback_scores' : json.dumps([]),
+        'success' :final_results['success'],
+        'confidence' : final_results['confidence'],
         }
     #Create grader object in controller by posting back results
-    created, msg = util._http_post(
-        controller_session,
-        urlparse.urljoin(settings.GRADING_CONTROLLER_INTERFACE['url'],
-            project_urls.ControllerURLs.put_result),
-        grader_dict,
-        settings.REQUESTS_TIMEOUT,
-    )
-    log.debug("Got response of {0} from server, message: {1}".format(created, msg))
+    essay_grade = EssayGrade(**grader_dict)
+    essay_grade.save()
 
     return sub_get_success
 
