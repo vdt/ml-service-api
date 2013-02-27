@@ -150,6 +150,7 @@ def handle_single_problem(problem):
                     results['success'],
                     results['errors'],
                 ))
+    transaction.commit_unless_managed()
     return True, "Creation succeeded."
 
 def save_model_file(results, save_to_s3):

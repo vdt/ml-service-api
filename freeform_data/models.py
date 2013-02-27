@@ -111,6 +111,30 @@ class EssayGrade(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+class Group(models.Model):
+    userprofile = models.ForeignKey(UserProfile)
+    class Meta:
+        abstract = True
+
+class StudentGroup(Group):
+    pass
+
+class TeacherGroup(Group):
+    pass
+
+class AdministratorGroup(Group):
+    pass
+
+class GraderGroup(Group):
+    pass
+
+USER_ROLE_MAPPINGS = {
+    UserRoles.student : StudentGroup,
+    UserRoles.teacher : TeacherGroup,
+    UserRoles.administrator : AdministratorGroup,
+    UserRoles.grader : GraderTypes,
+    }
+
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile, created = UserProfile.objects.get_or_create(user=instance)
@@ -123,12 +147,28 @@ def pre_delete_essay(sender, instance, **kwargs):
     essay_grades = EssayGrade.objects.filter(essay=instance)
     essay_grades.delete()
 
+def create_permission_group(sender,instance, **kwargs):
+    try:
+        role_group = USER_ROLE_MAPPINGS[instance.role]
+    except:
+        role_group = StudentGroup
+
+    role_group = role_group(
+        userprofile = instance,
+    )
+    role_group.save()
+
 post_save.connect(create_user_profile, sender=User)
 post_save.connect(create_api_key, sender=User)
+post_save.connect(create_permission_group,sender=UserProfile)
+
 pre_delete.connect(pre_delete_problem,sender=Problem)
 pre_delete.connect(pre_delete_essay,sender=Essay)
 
-User.profile = property(lambda u: u.get_profile() )
+User.profile = property(lambda u: u.get_profile())
+
+
+
 
 
 
