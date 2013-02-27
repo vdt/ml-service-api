@@ -93,8 +93,9 @@ def handle_single_essay(essay):
     essay_grade = EssayGrade(**grader_dict)
     essay_grade.save()
 
-    essay.has_been_ml_graded = True
-    essay.save()
+    if final_results['success']:
+        essay.has_been_ml_graded = True
+        essay.save()
     transaction.commit_unless_managed()
     return True, "Successfully scored!"
 
