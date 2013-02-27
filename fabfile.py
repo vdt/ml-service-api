@@ -36,6 +36,12 @@ def deploy():
                 #TODO: Insert repo name here
                 run('git clone git@github.com:VikParuchuri/service-api.git')
                 sudo('mv service-api ml-service-api')
+
+        ml_repo_exists = exists(ml_code_dir, use_sudo=True)
+        if not ml_repo_exists:
+            with cd(up_one_level_dir):
+                run('git git@github.com:MITx/machine-learning.git')
+
         sudo('chown -R vik {0}'.format(up_one_level_dir))
 
     with cd(code_dir), settings(warn_only=True):
@@ -43,7 +49,7 @@ def deploy():
         run('git pull')
         run('sudo apt-get update')
         run('sudo apt-get upgrade gcc')
-        run('sudo xargs -a apt-packages.txt apt-get install')
+        sudo('xargs -a apt-packages.txt apt-get install')
         result = run('source /opt/edx/bin/activate')
         if result.failed:
             sudo('apt-get install python-pip')
@@ -64,6 +70,11 @@ def deploy():
             run('python manage.py syncdb --settings=ml_service_api.aws --pythonpath={0}'.format(code_dir))
             run('python manage.py migrate --settings=ml_service_api.aws --pythonpath={0}'.format(code_dir))
             sudo('chown -R www-data {0}'.format(up_one_level_dir))
+
+        with cd(ml_code_dir):
+            sudo('xargs -a install/apt-packages.txt apt-get install')
+            run('pip install -r install/pre-requirements.txt')
+            run('pip install -r install/requirements.txt')
 
     with lcd(local_dir), settings(warn_only=True):
         with cd(up_one_level_dir):
