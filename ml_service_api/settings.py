@@ -137,7 +137,8 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'tastypie',
     'freeform_data',
-    'south'
+    'south',
+    'ml_grading'
 )
 
 # A sample logging configuration. The only tangible logging

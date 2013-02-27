@@ -9,6 +9,7 @@ import logging
 import sys
 from statsd import statsd
 import pickle
+from ml_grading.models import CreatedModel
 
 sys.path.append(settings.ML_PATH)
 import create
@@ -41,6 +42,7 @@ def handle_single_location(problem):
 
     graded_sub_count = len(essay_text)
     for m in xrange(0,first_len):
+        scores = [s[m] for s in essay_grades]
         log.debug("Currently on location {0} in problem {1}".format(m, problem.id))
         #Get paths to ml model from database
         relative_model_path, full_model_path= ml_grading_util.get_model_path(location,m)
@@ -83,15 +85,15 @@ def handle_single_location(problem):
                     'creation_started' : True,
                     'creation_finished' : False,
                     }
-                transaction.commit_unless_managed()
-                success, initial_id = ml_grading_util.save_created_model(created_model_dict_initial)
+                created_model = CreatedModel(**created_model_dict_initial)
+                created_model.save()
                 transaction.commit_unless_managed()
 
-                results = create.create(text, scores, prompt)
+                results = create.create(essay_text, scores, prompt)
 
                 scores = [int(score_item) for score_item in scores]
                 #Add in needed stuff that ml creator does not pass back
-                results.update({'text' : text, 'score' : scores, 'model_path' : full_model_path,
+                results.update({'text' : essay_text, 'score' : scores, 'model_path' : full_model_path,
                                 'relative_model_path' : relative_model_path, 'prompt' : prompt})
 
                 #Try to create model if ml model creator was successful
@@ -120,21 +122,16 @@ def handle_single_location(problem):
                     }
 
                 transaction.commit_unless_managed()
-                success, id = ml_grading_util.save_created_model(created_model_dict_final,update_model=True,update_id=initial_id)
-
-                if not success:
+                try:
+                    CreatedModel.objects.filter(pk=created_model.pk).update(**created_model_dict_final)
+                except:
                     log.error("ModelCreator creation failed.  Error: {0}".format(id))
-                    statsd.increment("open_ended_assessment.grading_controller.call_ml_creator",
-                        tags=["success:False", "location:{0}".format(location)])
 
                 log.debug("Location: {0} Creation Status: {1} Errors: {2}".format(
                     full_model_path,
                     results['success'],
                     results['errors'],
                 ))
-                statsd.increment("open_ended_assessment.grading_controller.call_ml_creator",
-                    tags=["success:{0}".format(results['success']), "location:{0}".format(location)])
-
 
 def save_model_file(results, save_to_s3):
     success=False
