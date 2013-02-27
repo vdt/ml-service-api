@@ -54,7 +54,7 @@ class Course(models.Model):
 
 class Problem(models.Model):
     #A course has many problems, and a problem can be used in many courses
-    course = models.ManyToManyField(Course)
+    courses = models.ManyToManyField(Course)
     #Max scores for one or many targets
     max_target_scores = models.TextField(default=json.dumps([1]))
     #If additional numeric predictors are being sent, the count of them

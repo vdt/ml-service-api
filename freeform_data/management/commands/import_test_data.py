@@ -16,7 +16,7 @@ import sys
 from ConfigParser import SafeConfigParser
 from datetime import datetime
 
-from freeform_data.models import Organization, Course, UserProfile
+from freeform_data.models import Organization, Course, UserProfile, Problem
 from django.contrib.auth.models import User
 
 log = logging.getLogger(__name__)
@@ -56,6 +56,25 @@ class Command(BaseCommand):
         user.save()
         course.users.add(user.profile)
         course.save()
+
+        problem, created = Problem.objects.get_or_create(
+            prompt = ""
+        )
+        problem.courses.add(course)
+        problem.save()
+        #A course has many problems, and a problem can be used in many courses
+        course = models.ManyToManyField(Course)
+        #Max scores for one or many targets
+        max_target_scores = models.TextField(default=json.dumps([1]))
+        #If additional numeric predictors are being sent, the count of them
+        number_of_additional_predictors = models.IntegerField(default=0)
+        #Prompt of the problem
+        prompt = models.TextField(default="")
+        #If org has subscriptions to premium feedback models
+        premium_feedback_models = models.TextField(default=json.dumps([]))
+
+        created = models.DateTimeField(auto_now_add=True)
+        modified = models.DateTimeField(auto_now=True)
 
         """
         header_name = "importdata"
