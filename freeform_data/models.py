@@ -73,7 +73,7 @@ class Essay(models.Model):
     #Each essay is written for a specific problem
     problem = models.ForeignKey(Problem)
     #Each essay is written by a specified user
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, null=True)
     #Each user writes text (their essay)
     essay_text = models.TextField()
     #Schools may wish to send additional predictors (student grade level, etc)
