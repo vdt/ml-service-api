@@ -20,7 +20,6 @@ def create_ml_models():
 def create_ml_models_single_problem(problem):
     handle_single_problem(problem)
 
-
 @periodic_task(run_every=timedelta(seconds=settings.TIME_BETWEEN_ML_GRADER_CHECKS))
 def grade_ml():
     essays = Essay.objects.filter(has_been_ml_graded=False)

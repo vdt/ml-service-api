@@ -23,8 +23,6 @@ from ml_grading import ml_grading_util
 sys.path.append(settings.ML_PATH)
 import grade
 
-from staff_grading import staff_grading_util
-
 log = logging.getLogger(__name__)
 
 RESULT_FAILURE_DICT={'success' : False, 'errors' : 'Errors!', 'confidence' : 0, 'feedback' : "", 'score' : 0}
