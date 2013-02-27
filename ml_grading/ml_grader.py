@@ -96,7 +96,7 @@ def handle_single_essay(essay):
     essay.has_been_ml_graded = True
     essay.save()
 
-    return sub_get_success
+    return True, "Successfully scored!"
 
 def load_model_file(created_model,use_full_path):
     try:

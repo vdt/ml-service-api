@@ -110,8 +110,10 @@ def handle_single_problem(problem):
 
                 scores = [int(score_item) for score_item in scores]
                 #Add in needed stuff that ml creator does not pass back
-                results.update({'text' : essay_text, 'score' : scores, 'model_path' : full_model_path,
-                                'relative_model_path' : relative_model_path, 'prompt' : prompt})
+                results.update({
+                    'model_path' : full_model_path,
+                    'relative_model_path' : relative_model_path
+                })
 
                 #Try to create model if ml model creator was successful
                 if results['success']:
