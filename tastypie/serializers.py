@@ -25,6 +25,9 @@ try:
 except ImportError:
     biplist = None
 
+import logging
+log = logging.getLogger(__name__)
+
 
 # Ugh & blah.
 # So doing a regular dump is generally fine, since Tastypie doesn't usually

@@ -15,10 +15,28 @@ def default_authorization():
     return Authorization()
 
 def default_authentication():
-    return Authentication()
+    return ApiKeyAuthentication()
 
 def default_serialization():
     return Serializer(formats=['json', 'jsonp', 'xml', 'yaml', 'html', 'plist'])
+
+class CreateUserResource(ModelResource):
+    class Meta:
+        allowed_methods = ['post']
+        object_class = User
+        authentication = Authentication()
+        authorization = Authorization()
+        include_resource_uri = False
+        fields = ['username']
+
+    def obj_create(self, bundle, request=None, **kwargs):
+        try:
+            bundle = super(CreateUserResource, self).obj_create(bundle, request, **kwargs)
+            bundle.obj.set_password(bundle.data.get('password'))
+            bundle.obj.save()
+        except IntegrityError:
+            raise BadRequest('That username already exists')
+        return bundle
 
 class OrganizationResource(ModelResource):
     class Meta:
@@ -81,6 +99,7 @@ class ProblemResource(ModelResource):
 class EssayResource(ModelResource):
     essay_grades = fields.OneToManyField('freeform_data.api.EssayGradeResource', 'essay_grades', full=True, null=True)
     user = fields.ForeignKey(UserProfileResource, 'user')
+    problem = fields.ForeignKey(ProblemResource, 'problem')
     class Meta:
         queryset = Essay.objects.all()
         resource_name = 'essay'
