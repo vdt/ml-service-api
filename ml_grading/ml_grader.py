@@ -29,9 +29,6 @@ RESULT_FAILURE_DICT={'success' : False, 'errors' : 'Errors!', 'confidence' : 0, 
 
 def handle_single_essay(essay):
     transaction.commit_unless_managed()
-    if not success:
-        log.error("No model exists yet for problem {0}".format(essay.problem))
-        return False
 
     #strip out unicode and other characters in student response
     #Needed, or grader may potentially fail
@@ -47,7 +44,7 @@ def handle_single_essay(essay):
 
         if not success:
             error_message = "Could not identify a valid created model!"
-            log.debug(error_message)
+            log.error(error_message)
             results= RESULT_FAILURE_DICT
             formatted_feedback="error"
             return False, error_message
