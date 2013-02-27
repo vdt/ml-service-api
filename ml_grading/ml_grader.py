@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 
 RESULT_FAILURE_DICT={'success' : False, 'errors' : 'Errors!', 'confidence' : 0, 'feedback' : "", 'score' : 0}
 
-def handle_single_item(essay):
+def handle_single_essay(essay):
     transaction.commit_unless_managed()
     if not success:
         log.error("No model exists yet for problem {0}".format(essay.problem))
@@ -97,6 +97,9 @@ def handle_single_item(essay):
     #Create grader object in controller by posting back results
     essay_grade = EssayGrade(**grader_dict)
     essay_grade.save()
+
+    essay.has_been_ml_graded = True
+    essay.save()
 
     return sub_get_success
 

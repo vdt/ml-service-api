@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 MAX_ESSAYS_TO_TRAIN_WITH = 1000
 MIN_ESSAYS_TO_TRAIN_WITH = 10
 
-def handle_single_location(problem):
+def handle_single_problem(problem):
     transaction.commit_unless_managed()
     prompt = problem.prompt
     essays = problem.essay_set.filter(essay_type="train")

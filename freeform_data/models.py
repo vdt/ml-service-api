@@ -80,6 +80,7 @@ class Essay(models.Model):
     additional_predictors = models.TextField(default=json.dumps([]))
     #The type of essay (train or test)  see EssayTypes class
     essay_type = models.CharField(max_length=20)
+    has_been_ml_graded = models.BooleanField(default=False)
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
