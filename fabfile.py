@@ -21,9 +21,18 @@ def deploy():
             put('service-id_rsa.pub','id_rsa.pub', use_sudo=True)
 
     with settings(warn_only=True):
-        sudo('chown -R vik {0}'.format(up_one_level_dir))
         sudo('service celery stop')
         sudo('service ml-service-api stop')
+        repo_exists = fabric.contrib.files.exists(code_dir, use_sudo=True)
+        if not repo_exists:
+            up_one_level_exists = fabric.contrib.files.exists(up_one_level_dir, use_sudo=True)
+            if not up_one_level_exists:
+                sudo('mkdir {0}'.format(up_one_level_dir))
+            with cd(up_one_level_dir):
+                #TODO: Insert repo name here
+                run('git clone git@github.com:MITx/service-api.git')
+        sudo('chown -R vik {0}'.format(up_one_level_dir))
+
     with cd(code_dir), settings(warn_only=True):
         # With git...
         run('git pull')
