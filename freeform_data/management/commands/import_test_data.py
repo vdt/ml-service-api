@@ -13,10 +13,11 @@ import time
 import json
 import logging
 import sys
+import json
 from ConfigParser import SafeConfigParser
 from datetime import datetime
 
-from freeform_data.models import Organization, Course, UserProfile, Problem
+from freeform_data.models import Organization, Course, UserProfile, Problem, Essay, EssayGrade
 from django.contrib.auth.models import User
 
 log = logging.getLogger(__name__)
@@ -34,8 +35,20 @@ class Command(BaseCommand):
         parser = SafeConfigParser()
         parser.read(args[0])
 
+
         print("Starting import...")
         print("Reading config from file {0}".format(args[0]))
+
+        header_name = "importdata"
+
+        prompt = parser.get(header_name, 'prompt')
+        essay_file = parser.get(header_name, 'essay_file')
+        essay_limit = int(parser.get(header_name, 'essay_limit'))
+        name = parser.get(header_name, "name")
+        add_score = parser.get(header_name, "add_grader_object") == "True"
+        max_target_scores = json.loads(parser.get(header_name, "max_target_scores"))
+        grader_type = parser.get(header_name, "grader_type")
+
         try:
             User.objects.create_user('vik', 'vik@edx.org', 'vik')
         except:
@@ -58,84 +71,40 @@ class Command(BaseCommand):
         course.save()
 
         problem, created = Problem.objects.get_or_create(
-            prompt = ""
+            prompt = prompt,
+            name = name,
         )
         problem.courses.add(course)
         problem.save()
-        #A course has many problems, and a problem can be used in many courses
-        course = models.ManyToManyField(Course)
-        #Max scores for one or many targets
-        max_target_scores = models.TextField(default=json.dumps([1]))
-        #If additional numeric predictors are being sent, the count of them
-        number_of_additional_predictors = models.IntegerField(default=0)
-        #Prompt of the problem
-        prompt = models.TextField(default="")
-        #If org has subscriptions to premium feedback models
-        premium_feedback_models = models.TextField(default=json.dumps([]))
 
-        created = models.DateTimeField(auto_now_add=True)
-        modified = models.DateTimeField(auto_now=True)
-
-        """
-        header_name = "importdata"
-
-        prompt = parser.get(header_name, 'prompt')
-        essay_file = parser.get(header_name, 'essay_file')
-        essay_limit = int(parser.get(header_name, 'essay_limit'))
-        state = parser.get(header_name, "state")
-        add_score = parser.get(header_name, "add_score_object") == "True"
-        max_score= int(parser.get(header_name,"max_score"))
-        min_score = int(parser.get(header_name,"min_score"))
-        essay_set_id = int(parser.get(header_name,"essay_set_id"))
-        essay_type = parser.get(header_name,"essay_type")
-
-        try:
-            essay_set = EssaySet.objects.get(id=essay_set_id)
-        except:
-            essay_set = EssaySet(
-                prompt=prompt,
-                max_score=max_score,
-                min_score=min_score,
-                user=user,
-                customer_data = user.customerdata,
-                grader_type = "CL",
-                scale_type = "CO",
-            )
-            essay_set.save()
-
-        grade, text = [], []
+        grades, text = [], []
         log.debug(settings.REPO_PATH)
         combined_raw = open(settings.REPO_PATH / essay_file).read()
         raw_lines = combined_raw.splitlines()
         for row in xrange(1, len(raw_lines)):
-            score1, text1 = raw_lines[row].strip().split("\t")
-            text.append(text1)
-            grade.append(int(score1))
+            line_split = raw_lines[row].strip().split("\t")
+            text.append(line_split[0])
+            grades.append(line_split[1:])
 
         for i in range(0, min(essay_limit, len(text))):
             essay = Essay(
-                essay_set = essay_set,
-                user =user,
-                type = essay_type,
-                state = state,
-                text = text[i],
+                problem = problem,
+                user =user.profile,
+                essay_type = "Narrative",
+                essay_text = text[i],
             )
 
             essay.save()
-            if add_score:
-                score = Score(
-                    grade=grade[i],
-                    feedback="",
-                    essay = essay,
-                    status=ScoreStatus.success,
-                    grader_id="",
-                    confidence=1,
-                )
-                score.save()
-
+            score = EssayGrade(
+                target_scores=json.dumps(grades[i]),
+                feedback="",
+                grader_type = grader_type,
+                essay = essay,
+                success = True,
+            )
+            score.save()
 
         print ("Successfully imported {0} essays using configuration in file {1}.".format(
             min(essay_limit, len(text)),
             args[0],
         ))
-        """
