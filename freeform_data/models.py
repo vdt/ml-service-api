@@ -63,6 +63,7 @@ class Problem(models.Model):
     prompt = models.TextField(default="")
     #If org has subscriptions to premium feedback models
     premium_feedback_models = models.TextField(default=json.dumps([]))
+    name = models.TextField(default="")
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
