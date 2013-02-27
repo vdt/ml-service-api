@@ -16,7 +16,7 @@ import sys
 from ConfigParser import SafeConfigParser
 from datetime import datetime
 
-from freeform_data.models import Organization
+from freeform_data.models import Organization, Course, UserProfile
 from django.contrib.auth.models import User
 
 log = logging.getLogger(__name__)
@@ -48,13 +48,13 @@ class Command(BaseCommand):
         )
 
         course, created = Course.objects.get_or_create(
-            course_name = "edX101"
+            course_name = "edX101",
+            organization = organization
         )
 
         user.profile.organization = organization
         user.save()
-        course.users.add(user)
-        course.organization = organization
+        course.users.add(user.profile)
         course.save()
 
         """
