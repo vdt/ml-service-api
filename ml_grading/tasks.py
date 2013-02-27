@@ -8,7 +8,7 @@ from ml_grading.ml_model_creation import handle_single_location
 
 log=logging.getLogger(__name__)
 
-@periodic_task(run_every=timedelta(seconds=TIME_BETWEEN_ML_CREATOR_CHECKS))
+@periodic_task(run_every=timedelta(seconds=30))
 def create_ml_models():
     problems = Problem.objects.all()
     for problem in problems:

@@ -51,7 +51,7 @@ class CourseResource(ModelResource):
             return object_list.filter(organization=request.user.profile.organization)
 
 class ProblemResource(ModelResource):
-    essays = fields.ManyToManyField('freeform_data.api.EssayResource', 'problem', full=True)
+    essays = fields.OneToManyField('freeform_data.api.EssayResource', 'essays', full=True, null=True)
     class Meta:
         queryset = Problem.objects.all()
         resource_name = 'problem'
@@ -66,7 +66,7 @@ class ProblemResource(ModelResource):
             return object_list.filter(course__in=request.user.profile.organization.course_set)
 
 class EssayResource(ModelResource):
-    essay_grades = fields.ManyToManyField('freeform_data.api.EssayGradeResource', 'essay', full=True)
+    essay_grades = fields.OneToManyField('freeform_data.api.EssayGradeResource', 'essay_grades', full=True, null=True)
     user = fields.ForeignKey(UserProfileResource, 'user')
     class Meta:
         queryset = Essay.objects.all()
@@ -82,7 +82,7 @@ class EssayResource(ModelResource):
             return object_list.filter(user_id=request.user.id)
 
 class EssayGradeResource(ModelResource):
-    user = fields.ForeignKey(UserProfileResource, 'user')
+    user = fields.ForeignKey(UserProfileResource, 'user', null=True)
     class Meta:
         queryset = EssayGrade.objects.all()
         resource_name = 'essay_grade'

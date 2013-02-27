@@ -2,6 +2,10 @@ import sys
 import os
 from path import path
 
+#Initialize celery
+import djcelery
+djcelery.setup_loader()
+
 # Django settings for ml_service_api project.
 ROOT_PATH = path(__file__).dirname()
 REPO_PATH = ROOT_PATH.dirname()
@@ -140,7 +144,7 @@ INSTALLED_APPS = (
     'freeform_data',
     'south',
     'ml_grading',
-    'djcelery'
+    'djcelery',
 )
 
 # A sample logging configuration. The only tangible logging

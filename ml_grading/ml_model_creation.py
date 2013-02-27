@@ -17,14 +17,16 @@ import create
 log = logging.getLogger(__name__)
 
 MAX_ESSAYS_TO_TRAIN_WITH = 1000
+MIN_ESSAYS_TO_TRAIN_WITH = 20
 
 def handle_single_location(problem):
     transaction.commit_unless_managed()
     prompt = problem.prompt
     essays = problem.essay_set.filter(essay_type="train")
-    essay_text = [e['text'] for e in essays.values('text')]
+    essay_text = [e['essay_text'] for e in essays.values('essay_text')]
     try:
         essay_grades = [json.loads(essay.get_instructor_scored()[0].target_scores) for essay in essays]
+        log.debug(essay_grades)
     except:
         error_message = "Problem with an instructor scored essay! {0}".format(essay_grades)
         log.exception(error_message)
@@ -41,6 +43,8 @@ def handle_single_location(problem):
         essay_grades = essay_grades[:MAX_ESSAYS_TO_TRAIN_WITH]
 
     graded_sub_count = len(essay_text)
+    if graded_sub_count < MIN_ESSAYS_TO_TRAIN_WITH:
+        return False, "Too few too create a model."
     for m in xrange(0,first_len):
         scores = [s[m] for s in essay_grades]
         log.debug("Currently on location {0} in problem {1}".format(m, problem.id))
