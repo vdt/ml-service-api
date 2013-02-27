@@ -40,10 +40,13 @@ def deploy():
         ml_repo_exists = exists(ml_code_dir, use_sudo=True)
         if not ml_repo_exists:
             with cd(up_one_level_dir):
-                run('git git@github.com:MITx/machine-learning.git')
+                run('git clone git@github.com:MITx/machine-learning.git')
 
         sudo('chown -R vik {0}'.format(up_one_level_dir))
 
+    with cd(ml_code_dir), settings(warn_only=True):
+        run('git pull')
+    
     with cd(code_dir), settings(warn_only=True):
         # With git...
         run('git pull')
