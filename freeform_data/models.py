@@ -147,6 +147,16 @@ def pre_delete_essay(sender, instance, **kwargs):
     essay_grades = EssayGrade.objects.filter(essay=instance)
     essay_grades.delete()
 
+def pre_delete_essaygrade(sender,instance, **kwargs):
+    """
+    Ensures that an ML model will be retrained if an old ML scored grade is removed for some reason
+    """
+    essay = instance.essay
+    ml_graded_count = essay.essaygrade_set.filter(grader_type=GraderTypes.machine).count()
+    if ml_graded_count<=1:
+        essay.has_been_ml_graded=False
+        essay.save()
+
 def create_permission_group(sender,instance, **kwargs):
     try:
         role_group = USER_ROLE_MAPPINGS[instance.role]
@@ -164,6 +174,7 @@ post_save.connect(create_permission_group,sender=UserProfile)
 
 pre_delete.connect(pre_delete_problem,sender=Problem)
 pre_delete.connect(pre_delete_essay,sender=Essay)
+pre_delete.connect(pre_delete_essaygrade,sender=EssayGrade)
 
 User.profile = property(lambda u: u.get_profile())
 
