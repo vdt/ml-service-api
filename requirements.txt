@@ -9,3 +9,4 @@ south
 django-celery
 celery-with-redis
 path.py
+fabric
