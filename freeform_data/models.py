@@ -73,7 +73,7 @@ class Essay(models.Model):
     #Each essay is written for a specific problem
     problem = models.ForeignKey(Problem)
     #Each essay is written by a specified user
-    user = models.ForeignKey(UserProfile)
+    user = models.ForeignKey(User)
     #Each user writes text (their essay)
     essay_text = models.TextField()
     #Schools may wish to send additional predictors (student grade level, etc)
@@ -104,7 +104,7 @@ class EssayGrade(models.Model):
     #whether or not the grader succeeded
     success = models.BooleanField()
     #For peer grading and staff grading, we will use this
-    user = models.ForeignKey(UserProfile,blank=True,null=True)
+    user = models.ForeignKey(User,blank=True,null=True)
     #Confidence value from the grader
     confidence = models.DecimalField(max_digits=10,decimal_places=9, default=1)
 

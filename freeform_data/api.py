@@ -65,6 +65,21 @@ class UserProfileResource(ModelResource):
         def apply_authorization_limits(self, request, object_list):
             return object_list.filter(user_id=request.user.id)
 
+class UserResource(ModelResource):
+    class Meta:
+        queryset = User.objects.all()
+        resource_name = 'user'
+
+        serializer = default_serialization()
+        authorization= default_authorization()
+        authentication = default_authentication()
+
+        def obj_create(self, bundle, request=None, **kwargs):
+            return super(UserProfileResource, self).obj_create(bundle, request, user=request.user)
+
+        def apply_authorization_limits(self, request, object_list):
+            return object_list.filter(user_id=request.user.id)
+
 class CourseResource(ModelResource):
     class Meta:
         queryset = Course.objects.all()
@@ -98,7 +113,7 @@ class ProblemResource(ModelResource):
 
 class EssayResource(ModelResource):
     essay_grades = fields.OneToManyField('freeform_data.api.EssayGradeResource', 'essay_grades', full=True, null=True)
-    user = fields.ForeignKey(UserProfileResource, 'user')
+    user = fields.ForeignKey(UserResource, 'user', null=True)
     problem = fields.ForeignKey(ProblemResource, 'problem')
     class Meta:
         queryset = Essay.objects.all()
@@ -109,13 +124,14 @@ class EssayResource(ModelResource):
         authentication = default_authentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
+            bundle.obj.user = request.user
             return super(EssayResource, self).obj_create(bundle, request, user=request.user)
 
         def apply_authorization_limits(self, request, object_list):
             return object_list.filter(user_id=request.user.id)
 
 class EssayGradeResource(ModelResource):
-    user = fields.ForeignKey(UserProfileResource, 'user', null=True)
+    user = fields.ForeignKey(UserResource, 'user', null=True)
     class Meta:
         queryset = EssayGrade.objects.all()
         resource_name = 'essay_grade'
@@ -125,6 +141,7 @@ class EssayGradeResource(ModelResource):
         authentication = default_authentication()
 
         def obj_create(self, bundle, request=None, **kwargs):
+            bundle.obj.user= request.user
             return super(EssayGradeResource, self).obj_create(bundle, request, user=request.user)
 
         def apply_authorization_limits(self, request, object_list):
