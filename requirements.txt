@@ -10,3 +10,4 @@ celery-with-redis
 path.py
 fabric
 gunicorn
+requests
