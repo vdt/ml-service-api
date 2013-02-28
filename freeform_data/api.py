@@ -10,6 +10,10 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from tastypie.http import HttpGone, HttpMultipleChoices
 from django.db.models import Q
 from tastypie.serializers import Serializer
+from django.db import IntegrityError
+from tastypie.exceptions import BadRequest
+import logging
+log=logging.getLogger(__name__)
 
 def default_authorization():
     return Authorization()
@@ -36,6 +40,7 @@ class CreateUserResource(ModelResource):
             bundle.obj.set_password(bundle.data.get('password'))
             bundle.obj.save()
         except IntegrityError:
+            log.exception("Could not create the user.")
             raise BadRequest('That username already exists')
         return bundle
 
