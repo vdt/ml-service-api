@@ -34,7 +34,7 @@ class UserProfile(models.Model):
     #TODO: Add in a callback where if user identifies as "administrator", then they can create an organization
     user = models.ForeignKey(User, unique=True, blank=True,null=True)
     #TODO: Potentially support users being in multiple orgs, but will be complicated
-    organization = models.ForeignKey(Organization, blank=True,null=True)
+    organization = models.ManyToManyField(Organization, blank=True,null=True)
     #Add in userinfo here.  Location, etc
     name = models.TextField(blank=True,null=True)
     #User role in their organization
@@ -46,7 +46,7 @@ class UserProfile(models.Model):
 class Course(models.Model):
     #A user can have many courses, and a course can have many users
     users = models.ManyToManyField(User)
-    organization = models.ForeignKey(Organization)
+    organization = models.ManyToManyField(Organization)
     #Each course has a name!
     course_name = models.TextField()
 
