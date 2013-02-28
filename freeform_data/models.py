@@ -184,24 +184,12 @@ def get_group_name(membership):
     group_name = "{0}_{1}".format(membership.organization.id,membership.role)
     return group_name
 
-def add_admin_user(sender,instance,**kwargs):
-    user =sender.user
-    user_count = instance.user_set.all().count()
-    if user_count==0:
-        membership = Membership(
-            user = user,
-            organization = instance,
-            role = UserRoles.administrator,
-        )
-        membership.save()
-
 #Django signals called after models are handled
 pre_save.connect(remove_user_from_groups, sender=Membership)
 
 post_save.connect(create_user_profile, sender=User)
 post_save.connect(create_api_key, sender=User)
 post_save.connect(add_user_to_groups, sender=Membership)
-post_save.connect(add_admin_user,sender=Organization)
 
 pre_delete.connect(pre_delete_problem,sender=Problem)
 pre_delete.connect(pre_delete_essay,sender=Essay)
