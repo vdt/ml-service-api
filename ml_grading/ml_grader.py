@@ -1,3 +1,7 @@
+"""
+The ML grader calls on the machine learning algorithm to grade a given essay
+"""
+
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
@@ -25,9 +29,11 @@ import grade
 
 log = logging.getLogger(__name__)
 
+#this is returned if the ML algorithm fails
 RESULT_FAILURE_DICT={'success' : False, 'errors' : 'Errors!', 'confidence' : 0, 'feedback' : "", 'score' : 0}
 
 def handle_single_essay(essay):
+    #Needed to ensure that the DB is not wrapped in a transaction and pulls old data
     transaction.commit_unless_managed()
 
     #strip out unicode and other characters in student response
@@ -35,11 +41,13 @@ def handle_single_essay(essay):
     #TODO: Handle unicode in student responses properly
     student_response = essay.essay_text.encode('ascii', 'ignore')
 
+    #Gets both the max scores for each target and the number of targets
     target_max_scores = json.loads(essay.problem.max_target_scores)
     target_counts = len(target_max_scores)
 
     target_scores=[]
     for m in xrange(0,target_counts):
+        #Gets latest model for a given problem and target
         success, created_model=ml_grading_util.get_latest_created_model(essay.problem,m)
 
         if not success:
@@ -51,16 +59,21 @@ def handle_single_essay(essay):
 
         #Create grader path from location in submission
         grader_path = os.path.join(settings.ML_MODEL_PATH,created_model.model_relative_path)
+
+        #Indicates whether the model is stored locally or in the cloud
         model_stored_in_s3=created_model.model_stored_in_s3
 
+        #Try to load the model file
         success, grader_data=load_model_file(created_model,use_full_path=False)
         if success:
+            #Send to ML grading algorithm to be graded
             results = grade.grade(grader_data, student_response)
         else:
             results=RESULT_FAILURE_DICT
 
         #If the above fails, try using the full path in the created_model object
         if not results['success'] and not created_model.model_stored_in_s3:
+            #Before, we used the relative path to load.  Possible that the full path may work
             grader_path=created_model.model_full_path
             try:
                 success, grader_data=load_model_file(created_model,use_full_path=True)
@@ -95,13 +108,20 @@ def handle_single_essay(essay):
     # Create grader object in controller by posting back results
     essay_grade = EssayGrade(**grader_dict)
     essay_grade.save()
+    #Update the essay so that it doesn't keep trying to re-grade
     essay.has_been_ml_graded = True
     essay.save()
     transaction.commit_unless_managed()
     return True, "Successfully scored!"
 
 def load_model_file(created_model,use_full_path):
+    """
+    Tries to load a model file
+    created_model - instance of CreatedModel (django model)
+    use_full_path - boolean, indicates whether or not to use the full model path
+    """
     try:
+        #Uses pickle to load a local file
         if use_full_path:
             grader_data=pickle.load(file(created_model.model_full_path,"r"))
         else:
@@ -112,6 +132,7 @@ def load_model_file(created_model,use_full_path):
         #Move on to trying S3
         pass
 
+    #If we cannot load the local file, look to the cloud
     try:
         r = requests.get(created_model.s3_public_url, timeout=2)
         grader_data=pickle.loads(r.text)
@@ -119,6 +140,7 @@ def load_model_file(created_model,use_full_path):
         log.exception("Problem with S3 connection.")
         return False, "Could not load."
 
+    #If we pulled down a file from the cloud, then store it locally for the future
     try:
         store_model_locally(created_model,grader_data)
     except:
@@ -129,6 +151,11 @@ def load_model_file(created_model,use_full_path):
     return True, grader_data
 
 def store_model_locally(created_model,results):
+    """
+    Saves a model to a local file.
+    created_model - instance of CreatedModel (django model)
+    results - result dictionary to save
+    """
     relative_model_path= created_model.model_relative_path
     full_model_path = os.path.join(settings.ML_MODEL_PATH,relative_model_path)
     try:
