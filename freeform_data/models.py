@@ -26,15 +26,14 @@ class Organization(models.Model):
     organization_name = models.TextField(default="")
     #TODO: Add in billing details, etc later, along with rules on when to ask
     premium_service_subscriptions = models.TextField(default=json.dumps([]))
-
+    users = models.ManyToManyField(User, blank=True,null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
 class UserProfile(models.Model):
     #TODO: Add in a callback where if user identifies as "administrator", then they can create an organization
-    user = models.ForeignKey(User, unique=True, blank=True,null=True)
+    user = models.OneToOneField(User, unique=True, blank=True,null=True)
     #TODO: Potentially support users being in multiple orgs, but will be complicated
-    organization = models.ManyToManyField(Organization, blank=True,null=True)
     #Add in userinfo here.  Location, etc
     name = models.TextField(blank=True,null=True)
     #User role in their organization
@@ -46,7 +45,7 @@ class UserProfile(models.Model):
 class Course(models.Model):
     #A user can have many courses, and a course can have many users
     users = models.ManyToManyField(User)
-    organization = models.ManyToManyField(Organization)
+    organizations = models.ManyToManyField(Organization)
     #Each course has a name!
     course_name = models.TextField()
 

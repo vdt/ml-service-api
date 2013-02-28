@@ -42,6 +42,7 @@ class CreateUserResource(ModelResource):
         return bundle
 
 class OrganizationResource(ModelResource):
+    courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
     class Meta:
         queryset = Organization.objects.all()
         resource_name = 'organization'
@@ -54,6 +55,7 @@ class OrganizationResource(ModelResource):
         return super(OrganizationResource, self).obj_create(bundle)
 
 class UserProfileResource(ModelResource):
+    user = fields.ToOneField('freeform_data.api.UserResource', 'user', related_name='userprofile')
     class Meta:
         queryset = UserProfile.objects.all()
         resource_name = 'user_profile'
@@ -72,6 +74,7 @@ class UserResource(ModelResource):
     essaygrades = fields.ToManyField('freeform_data.api.EssayGradeResource', 'essaygrade_set', null=True, related_name='user')
     essays = fields.ToManyField('freeform_data.api.EssayResource', 'essay_set', null=True, related_name='user')
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
+    userprofile = fields.ToOneField('freeform_data.api.UserProfileResource', 'userprofile', related_name='user')
     class Meta:
         queryset = User.objects.all()
         resource_name = 'user'
@@ -93,8 +96,8 @@ class UserResource(ModelResource):
 
 
 class CourseResource(ModelResource):
-    organizations = fields.ToManyField(OrganizationResource, 'organization_set', null=True)
-    users = fields.ToManyField(UserResource, 'user_set', null=True)
+    organizations = fields.ToManyField(OrganizationResource, 'organizations', null=True)
+    users = fields.ToManyField(UserResource, 'users', null=True)
     problems = fields.ToManyField('freeform_data.api.ProblemResource', 'problem_set', null=True)
     class Meta:
         queryset = Course.objects.all()
@@ -112,7 +115,7 @@ class CourseResource(ModelResource):
 
 class ProblemResource(ModelResource):
     essays = fields.ToManyField('freeform_data.api.EssayResource', 'essay_set', null=True, related_name='problem')
-    courses = fields.ToManyField('freeform_data.api.CourseResource')
+    courses = fields.ToManyField('freeform_data.api.CourseResource', 'courses')
     class Meta:
         queryset = Problem.objects.all()
         resource_name = 'problem'
