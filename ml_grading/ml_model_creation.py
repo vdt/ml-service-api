@@ -24,12 +24,19 @@ def handle_single_problem(problem):
     transaction.commit_unless_managed()
     prompt = problem.prompt
     essays = problem.essay_set.filter(essay_type="train")
-    essay_text = [e['essay_text'] for e in essays.values('essay_text')]
+    essay_text = []
+    essay_grades = []
+    essay_text_vals = essays.values('essay_text')
     try:
-        essay_grades = [json.loads(essay.get_instructor_scored()[0].target_scores) for essay in essays]
+        for essay in essays:
+            try:
+                essay_grades.append(json.loads(essay.get_instructor_scored()[0].target_scores))
+                essay_text.append(essay_text_vals['essay_text'])
+            except:
+                log.exception("Could not get latest instructor scored for {0}".format(essay))
         log.debug(essay_grades)
     except:
-        error_message = "Problem with an instructor scored essay! {0}".format(essay_grades)
+        error_message = "Problem with an instructor scored essay! {0}".format(essays)
         log.exception(error_message)
         return False, error_message
     try:
