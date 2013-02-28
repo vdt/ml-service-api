@@ -2,7 +2,7 @@ from tastypie.resources import ModelResource
 from freeform_data.models import Organization, UserProfile, Course, Problem, Essay, EssayGrade
 from django.contrib.auth.models import User
 from tastypie.authorization import Authorization
-from tastypie.authentication import Authentication, ApiKeyAuthentication
+from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication
 from tastypie import fields
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
@@ -30,18 +30,14 @@ class CreateUserResource(ModelResource):
         object_class = User
         authentication = Authentication()
         authorization = Authorization()
-        include_resource_uri = False
         fields = ['username']
-        resource_name = 'create_user'
+        resource_name = "create_user"
 
-    def obj_create(self, bundle, request=None, **kwargs):
+    def obj_create(self, bundle, **kwargs):
+        username, password = bundle.data['username'], bundle.data['password']
         try:
-            bundle.request = request
-            bundle = super(CreateUserResource, self).obj_create(bundle, **kwargs)
-            bundle.obj.set_password(bundle.data.get('password'))
-            bundle.obj.save()
+            bundle.obj = User.objects.create_user(username, '', password)
         except IntegrityError:
-            log.exception("Could not create the user.")
             raise BadRequest('That username already exists')
         return bundle
 
@@ -54,9 +50,8 @@ class OrganizationResource(ModelResource):
         authorization= default_authorization()
         authentication = default_authentication()
 
-        def obj_create(self, bundle, request=None, **kwargs):
-            bundle.request = request
-            return super(OrganizationResource, self).obj_create(bundle)
+    def obj_create(self, bundle, **kwargs):
+        return super(OrganizationResource, self).obj_create(bundle)
 
 class UserProfileResource(ModelResource):
     class Meta:
@@ -67,28 +62,33 @@ class UserProfileResource(ModelResource):
         authorization= default_authorization()
         authentication = default_authentication()
 
-        def obj_create(self, bundle, request=None, **kwargs):
-            bundle.request = request
-            return super(UserProfileResource, self).obj_create(bundle,user=request.user)
+    def obj_create(self, bundle, request=None, **kwargs):
+        return super(UserProfileResource, self).obj_create(bundle,user=request.user)
 
-        def apply_authorization_limits(self, request, object_list):
-            return object_list.filter(user_id=request.user.id)
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.filter(user_id=request.user.id)
 
 class UserResource(ModelResource):
+
     class Meta:
         queryset = User.objects.all()
         resource_name = 'user'
 
         serializer = default_serialization()
         authorization= default_authorization()
-        authentication = default_authentication()
+        authentication = BasicAuthentication()
 
-        def obj_create(self, bundle, request=None, **kwargs):
-            bundle.request = request
-            return super(UserProfileResource, self).obj_create(bundle)
+    def obj_create(self, bundle, **kwargs):
+        return super(UserResource, self).obj_create(bundle)
 
-        def apply_authorization_limits(self, request, object_list):
-            return object_list.filter(user_id=request.user.id)
+    def dehydrate(self, bundle):
+        bundle.data['api_key'] = bundle.obj.api_key.key
+        return bundle
+
+    def apply_authorization_limits(self, request, object_list):
+        log.debug("Applying limits.")
+        return object_list.filter(user_id=request.user.id)
+
 
 class CourseResource(ModelResource):
     class Meta:
@@ -99,12 +99,11 @@ class CourseResource(ModelResource):
         authorization= default_authorization()
         authentication = default_authentication()
 
-        def obj_create(self, bundle, request=None, **kwargs):
-            bundle.request = request
-            return super(CourseResource, self).obj_create(bundle, user=request.user)
+    def obj_create(self, bundle, **kwargs):
+        return super(CourseResource, self).obj_create(bundle, user=request.user)
 
-        def apply_authorization_limits(self, request, object_list):
-            return object_list.filter(organization=request.user.profile.organization)
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.filter(organization=request.user.profile.organization)
 
 class ProblemResource(ModelResource):
     essays = fields.OneToManyField('freeform_data.api.EssayResource', 'essay_set', full=True, null=True)
@@ -116,12 +115,11 @@ class ProblemResource(ModelResource):
         authorization= default_authorization()
         authentication = default_authentication()
 
-        def obj_create(self, bundle, request=None, **kwargs):
-            bundle.request = request
-            return super(ProblemResource, self).obj_create(bundle)
+    def obj_create(self, bundle, **kwargs):
+        return super(ProblemResource, self).obj_create(bundle)
 
-        def apply_authorization_limits(self, request, object_list):
-            return object_list.filter(course__in=request.user.profile.organization.course_set)
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.filter(course__in=request.user.profile.organization.course_set)
 
 class EssayResource(ModelResource):
     essay_grades = fields.OneToManyField('freeform_data.api.EssayGradeResource', 'essaygrade_set', full=True, null=True)
@@ -135,14 +133,13 @@ class EssayResource(ModelResource):
         authorization= default_authorization()
         authentication = default_authentication()
 
-        def obj_create(self, bundle, request=None, **kwargs):
-            bundle.request = request
-            bundle = super(EssayGradeResource, self).obj_create(bundle, user=request.user)
-            bundle.obj.user = request.user
-            bundle.obj.save()
+    def obj_create(self, bundle, **kwargs):
+        bundle = super(EssayGradeResource, self).obj_create(bundle, user=request.user)
+        bundle.obj.user = request.user
+        bundle.obj.save()
 
-        def apply_authorization_limits(self, request, object_list):
-            return object_list.filter(user_id=request.user.id)
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.filter(user_id=request.user.id)
 
 class EssayGradeResource(ModelResource):
     user = fields.ForeignKey(UserResource, 'user', null=True)
@@ -154,12 +151,11 @@ class EssayGradeResource(ModelResource):
         authorization= default_authorization()
         authentication = default_authentication()
 
-        def obj_create(self, bundle, request=None, **kwargs):
-            bundle.request = request
-            bundle = super(EssayGradeResource, self).obj_create(bundle, user=request.user)
-            bundle.obj.user = request.user
-            bundle.obj.save()
-            return bundle
+    def obj_create(self, bundle, **kwargs):
+        bundle = super(EssayGradeResource, self).obj_create(bundle, user=request.user)
+        bundle.obj.user = request.user
+        bundle.obj.save()
+        return bundle
 
-        def apply_authorization_limits(self, request, object_list):
-            return object_list.filter(essay__user_id=Q(request.user.id)|Q(user_id=request.user.id))
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.filter(essay__user_id=Q(request.user.id)|Q(user_id=request.user.id))
