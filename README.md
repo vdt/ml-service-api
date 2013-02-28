@@ -38,7 +38,6 @@ Contributions are very welcome.  The easiest way is to fork this repo, and then 
 
 Installation
 ----------------------
-Please see install_notes.txt in the documentation directory for more detailed install information.
 Looking at fabfile.py is also a good idea of how to install this.  The commands in fabfile will take a system
 from a fresh start to a fully working install.
 The main steps are:
@@ -79,16 +78,11 @@ The postman add-on for Chrome is highly recommended to do this.
 Once you create a user, you will be able to interact with the various API resources.  I will get into how they
 are organized below.
 
-API Structure
------------------------
-The API is structured around Django models.  Tastypie abstracts the API into model resources.  These resources allow
-for GET/POST/PUT/DELETE operations on the models.  This allows for a very simple interface.  You may have also noted
-the ?format=json blocks earlier.  A variety of format can be used, including 'json', 'jsonp', 'xml', 'yaml', 'html', and 'plist'.
-Note that HTML will return a "not implemented yet" message.
+Detailed Information
+-------------------------
+Please look in the documentation folder for more detailed documentation.
 
-The available models are organization, userprofile, user, course, problem, essay, essaygrade.  Each model can be
-accessed via http://127.0.0.1:9000/essay_site/api/v1/MODEL_NAME_HERE/ Appending schema to the end of this will
-show you the available actions.
+Subdirectories of documentation:
 
-By default, each user is restricted to only seeing the objects that they created.  This will be changed a bit when
-a permissions model is added.
+* api has information on the api, such as structure and models.
+* installation should have some more detailed install instructions down the line, but is sparse for now.
