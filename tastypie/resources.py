@@ -294,6 +294,7 @@ class Resource(object):
         # Prep the data going out.
         data = {
             "error_message": getattr(settings, 'TASTYPIE_CANNED_ERROR', "Sorry, this request could not be processed. Please try again later."),
+            "traceback": the_trace,
         }
         return self.error_response(request, data, response_class=response_class)
 
