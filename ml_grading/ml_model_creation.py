@@ -27,12 +27,12 @@ def handle_single_problem(problem):
     essay_text = []
     essay_grades = []
     essay_text_vals = essays.values('essay_text')
-    for essay in essays:
+    for i in xrange(0,len(essays)):
         try:
-            essay_grades.append(json.loads(essay.get_instructor_scored()[0].target_scores))
-            essay_text.append(essay_text_vals['essay_text'])
+            essay_grades.append(json.loads(essays[i].get_instructor_scored()[0].target_scores))
+            essay_text.append(essay_text_vals[i]['essay_text'])
         except:
-            log.exception("Could not get latest instructor scored for {0}".format(essay))
+            log.exception("Could not get latest instructor scored for {0}".format(essays[i]))
     log.debug(essay_grades)
 
     try:
@@ -55,7 +55,9 @@ def handle_single_problem(problem):
 
     graded_sub_count = len(essay_text)
     if graded_sub_count < MIN_ESSAYS_TO_TRAIN_WITH:
-        return False, "Too few too create a model."
+        error_message = "Too few too create a model for problem {0}".format(problem)
+        log.error(error_message)
+        return False, error_message
 
     for m in xrange(0,first_len):
         scores = [s[m] for s in essay_grades]
