@@ -93,8 +93,9 @@ class UserResource(ModelResource):
 
 
 class CourseResource(ModelResource):
-    organization = fields.ForeignKey(OrganizationResource, 'organization', null=True)
+    organizations = fields.ToManyField(OrganizationResource, 'organization_set', null=True)
     users = fields.ToManyField(UserResource, 'user_set', null=True)
+    problems = fields.ToManyField('freeform_data.api.ProblemResource', 'problem_set', null=True)
     class Meta:
         queryset = Course.objects.all()
         resource_name = 'course'
@@ -128,7 +129,7 @@ class ProblemResource(ModelResource):
 
 class EssayResource(ModelResource):
     essaygrades = fields.ToManyField('freeform_data.api.EssayGradeResource', 'essaygrade_set', null=True, related_name='essay')
-    user = fields.ToOneField(UserResource, 'user')
+    user = fields.ToOneField(UserResource, 'user', null=True)
     problem = fields.ToOneField(ProblemResource, 'problem')
     class Meta:
         queryset = Essay.objects.all()
