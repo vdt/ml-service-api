@@ -94,6 +94,9 @@ def deploy():
         with cd('/etc/init'):
             put('service-celery.conf', 'celery.conf', use_sudo=True)
             put('service-ml-service-api.conf', 'ml-service-api.conf', use_sudo=True)
+        with cd('/etc/nginx/sites-available'):
+            put('service-nginx', 'default', use_sudo=True)
 
     sudo('service celery start')
     sudo('service ml-service-api start')
+    sudo('service nginx restart')
