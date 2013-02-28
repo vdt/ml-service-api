@@ -18,6 +18,8 @@ def deploy():
     database_dir = '/opt/wwc/db'
     remote_ssh_dir = '/home/vik/.ssh'
     local_dir = '/home/vik/mitx_all'
+    nltk_data_dir = '/usr/share/nltk_data'
+
     sudo('sysctl vm.overcommit_memory=1')
     with lcd(local_dir), settings(warn_only=True):
         with cd(remote_ssh_dir):
@@ -70,9 +72,10 @@ def deploy():
         #sudo('apt-get build-dep python-scipy')
         run('pip install numpy')
         run('pip install scipy')
-        sudo('mkdir /usr/share/nltk_data')
-        sudo('python -m nltk.downloader -d /usr/share/nltk_data all')
-        sudo('chown -R vik /usr/share/nltk_data')
+        sudo('mkdir {0}'.format(nltk_data_dir))
+        if not exists(nltk_data_dir):
+            sudo('python -m nltk.downloader -d {0} all'.format(nltk_data_dir))
+        sudo('chown -R vik {0}'.format(nltk_data_dir))
 
         with cd(code_dir):
             run('pip install -r requirements.txt')
