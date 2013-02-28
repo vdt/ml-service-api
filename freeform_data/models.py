@@ -26,12 +26,14 @@ class Organization(models.Model):
     organization_name = models.TextField(default="")
     #TODO: Add in billing details, etc later, along with rules on when to ask
     premium_service_subscriptions = models.TextField(default=json.dumps([]))
+    #Each organization can have many users, and a user can be in multiple organizations
     users = models.ManyToManyField(User, blank=True,null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
 class UserProfile(models.Model):
     #TODO: Add in a callback where if user identifies as "administrator", then they can create an organization
+    #Each userprofile has one user, and vice versa
     user = models.OneToOneField(User, unique=True, blank=True,null=True)
     #TODO: Potentially support users being in multiple orgs, but will be complicated
     #Add in userinfo here.  Location, etc
@@ -45,6 +47,7 @@ class UserProfile(models.Model):
 class Course(models.Model):
     #A user can have many courses, and a course can have many users
     users = models.ManyToManyField(User)
+    #A course can be shared between organizations
     organizations = models.ManyToManyField(Organization)
     #Each course has a name!
     course_name = models.TextField()
@@ -135,14 +138,23 @@ USER_ROLE_MAPPINGS = {
     }
 
 def create_user_profile(sender, instance, created, **kwargs):
+    """
+    Creates a user profile based on a signal from User when it is created
+    """
     if created:
         profile, created = UserProfile.objects.get_or_create(user=instance)
 
 def pre_delete_problem(sender, instance, **kwargs):
+    """
+    Deletes essays associated with a problem when it is deleted
+    """
     essays = Essay.objects.filter(problem=instance)
     essays.delete()
 
 def pre_delete_essay(sender, instance, **kwargs):
+    """
+    Deletes essay grades associated with an essay when it is deleted
+    """
     essay_grades = EssayGrade.objects.filter(essay=instance)
     essay_grades.delete()
 
@@ -157,6 +169,9 @@ def pre_delete_essaygrade(sender,instance, **kwargs):
         essay.save()
 
 def pre_delete_user(sender,instance,**kwargs):
+    """
+    Removes the user's profile and removes foreign key relations from objects
+    """
     user_profile = user.profile
     essays = user.essay_set.all()
     essay_grades = user.essaygrade_set.all()
@@ -165,6 +180,9 @@ def pre_delete_user(sender,instance,**kwargs):
     essay_grades.update(user=None)
 
 def create_permission_group(sender,instance, **kwargs):
+    """
+    Creates a permission group for a given user
+    """
     try:
         role_group = USER_ROLE_MAPPINGS[instance.role]
     except:
@@ -175,6 +193,7 @@ def create_permission_group(sender,instance, **kwargs):
     )
     role_group.save()
 
+#Django signals called after models are handled
 post_save.connect(create_user_profile, sender=User)
 post_save.connect(create_api_key, sender=User)
 post_save.connect(create_permission_group,sender=UserProfile)
@@ -184,6 +203,7 @@ pre_delete.connect(pre_delete_essay,sender=Essay)
 pre_delete.connect(pre_delete_essaygrade,sender=EssayGrade)
 pre_delete.connect(pre_delete_user, sender=User)
 
+#Maps the get_profile() function of a user to an attribute profile
 User.profile = property(lambda u: u.get_profile())
 
 
