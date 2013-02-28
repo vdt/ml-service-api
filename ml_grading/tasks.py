@@ -26,7 +26,7 @@ def create_ml_models_single_problem(problem):
 @periodic_task(run_every=timedelta(seconds=settings.TIME_BETWEEN_ML_GRADER_CHECKS))
 def grade_ml():
     transaction.commit_unless_managed()
-    problems = Problem.objects.filter(essay__has_been_ml_graded=True).annotate(essay_count=Count('essay')).filter(essay_count__gt=MIN_ESSAYS_TO_TRAIN_WITH)
+    problems = Problem.objects.filter(essay__has_been_ml_graded=True).annotate(essay_count=Count('essay')).filter(essay_count__gt=(MIN_ESSAYS_TO_TRAIN_WITH-1))
     essays = Essay.objects.filter(problem__in=problems, has_been_ml_graded=False)
     for essay in essays:
         grade_ml_single_essay(essay)
