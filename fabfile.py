@@ -38,7 +38,7 @@ def deploy():
                 sudo('mkdir {0}'.format(up_one_level_dir))
             with cd(up_one_level_dir):
                 #TODO: Insert repo name here
-                run('git clone git@github.com:VikParuchuri/service-api.git')
+                run('git clone git@github.com:edx/ml-service-api.git')
                 sudo('mv service-api ml-service-api')
 
         ml_repo_exists = exists(ml_code_dir, use_sudo=True)
