@@ -92,7 +92,7 @@ class UserResource(ModelResource):
 
 class CourseResource(ModelResource):
     organization = fields.ForeignKey(OrganizationResource, 'organization', null=True)
-    users = fields.ManyToManyField(UserResource, 'user', null=True)
+    users = fields.ManyToManyField(UserResource, 'user_set', null=True)
     class Meta:
         queryset = Course.objects.all()
         resource_name = 'course'
