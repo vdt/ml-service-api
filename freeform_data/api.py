@@ -113,7 +113,7 @@ class CourseResource(ModelResource):
         return super(CourseResource, self).obj_create(bundle, user=bundle.request.user)
 
     def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(organization__in=request.user.organization)
+        return object_list.filter(organization__in=request.user.organizations)
 
 class ProblemResource(ModelResource):
     essays = fields.ToManyField('freeform_data.api.EssayResource', 'essay_set', null=True, related_name='problem')
@@ -130,7 +130,7 @@ class ProblemResource(ModelResource):
         return super(ProblemResource, self).obj_create(bundle)
 
     def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(course__in=request.user.organization.course_set)
+        return object_list.filter(course__in=request.user.organizations.courses)
 
 class EssayResource(ModelResource):
     essaygrades = fields.ToManyField('freeform_data.api.EssayGradeResource', 'essaygrade_set', null=True, related_name='essay')
