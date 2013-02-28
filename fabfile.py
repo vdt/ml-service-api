@@ -50,7 +50,6 @@ def deploy():
 
     with cd(ml_code_dir), settings(warn_only=True):
         run('git pull')
-        run('python -m nltk.downloader -d /usr/share/nltk_data all')
 
     with cd(code_dir), settings(warn_only=True):
         # With git...
@@ -70,6 +69,9 @@ def deploy():
         #sudo('apt-get build-dep python-scipy')
         run('pip install numpy')
         run('pip install scipy')
+        sudo('mkdir /usr/share/nltk_data')
+        sudo('python -m nltk.downloader -d /usr/share/nltk_data all')
+        sudo('chown -R vik /usr/share/nltk_data')
 
         with cd(code_dir):
             run('pip install -r requirements.txt')
