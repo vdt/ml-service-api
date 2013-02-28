@@ -157,6 +157,14 @@ def pre_delete_essaygrade(sender,instance, **kwargs):
         essay.has_been_ml_graded=False
         essay.save()
 
+def pre_delete_user(sender,instance,**kwargs):
+    user_profile = user.profile
+    essays = user.essay_set.all()
+    essay_grades = user.essaygrade_set.all()
+    user_profile.delete()
+    essays.update(user=None)
+    essay_grades.update(user=None)
+
 def create_permission_group(sender,instance, **kwargs):
     try:
         role_group = USER_ROLE_MAPPINGS[instance.role]
@@ -175,6 +183,7 @@ post_save.connect(create_permission_group,sender=UserProfile)
 pre_delete.connect(pre_delete_problem,sender=Problem)
 pre_delete.connect(pre_delete_essay,sender=Essay)
 pre_delete.connect(pre_delete_essaygrade,sender=EssayGrade)
+pre_delete.connect(pre_delete_user, sender=User)
 
 User.profile = property(lambda u: u.get_profile())
 
