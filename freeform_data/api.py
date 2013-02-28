@@ -2,7 +2,7 @@ from tastypie.resources import ModelResource
 from freeform_data.models import Organization, UserProfile, Course, Problem, Essay, EssayGrade
 from django.contrib.auth.models import User
 from tastypie.authorization import Authorization
-from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication
+from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication, MultiAuthentication
 from tastypie import fields
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
@@ -19,7 +19,7 @@ def default_authorization():
     return Authorization()
 
 def default_authentication():
-    return ApiKeyAuthentication()
+    return MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
 
 def default_serialization():
     return Serializer(formats=['json', 'jsonp', 'xml', 'yaml', 'html', 'plist'])
@@ -76,7 +76,7 @@ class UserResource(ModelResource):
 
         serializer = default_serialization()
         authorization= default_authorization()
-        authentication = BasicAuthentication()
+        authentication = default_authentication()
 
     def obj_create(self, bundle, **kwargs):
         return super(UserResource, self).obj_create(bundle)
