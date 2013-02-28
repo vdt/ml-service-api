@@ -1,3 +1,6 @@
+"""
+Local settings file
+"""
 import sys
 import os
 from path import path
