@@ -27,18 +27,14 @@ def handle_single_problem(problem):
     essay_text = []
     essay_grades = []
     essay_text_vals = essays.values('essay_text')
-    try:
-        for essay in essays:
-            try:
-                essay_grades.append(json.loads(essay.get_instructor_scored()[0].target_scores))
-                essay_text.append(essay_text_vals['essay_text'])
-            except:
-                log.exception("Could not get latest instructor scored for {0}".format(essay))
-        log.debug(essay_grades)
-    except:
-        error_message = "Problem with an instructor scored essay! {0}".format(essays)
-        log.exception(error_message)
-        return False, error_message
+    for essay in essays:
+        try:
+            essay_grades.append(json.loads(essay.get_instructor_scored()[0].target_scores))
+            essay_text.append(essay_text_vals['essay_text'])
+        except:
+            log.exception("Could not get latest instructor scored for {0}".format(essay))
+    log.debug(essay_grades)
+
     try:
         essay_text = [et.encode('ascii', 'ignore') for et in essay_text]
     except:
