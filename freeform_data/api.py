@@ -1,4 +1,4 @@
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, Resource
 from freeform_data.models import Organization, UserProfile, Course, Problem, Essay, EssayGrade, Membership, UserRoles
 from django.contrib.auth.models import User
 from tastypie.authorization import Authorization
@@ -43,7 +43,10 @@ class CreateUserResource(ModelResource):
 
 class OrganizationResource(ModelResource):
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
-    users = fields.ToManyField('freeform_data.api.UserResource', 'users', null=True)
+    #users = fields.ToManyField('freeform_data.api.UserResource', 'users', null=True)
+    user_query = lambda bundle: bundle.obj.users.through.objects.all() or bundle.obj.users
+    users = fields.ToManyField("freeform_data.api.MembershipResource", attribute=user_query, null=True)
+    memberships = fields.ToManyField("freeform_data.api.MembershipResource", 'membership_set', null=True)
     class Meta:
         queryset = Organization.objects.all()
         resource_name = 'organization'
@@ -54,9 +57,22 @@ class OrganizationResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(OrganizationResource, self).obj_create(bundle)
+        #bundle.obj.save()
+        return bundle
+
+    def save_m2m(self,bundle):
+        add_membership(bundle.request.user, bundle.obj)
         bundle.obj.save()
-        add_admin_user(bundle.request.user, bundle.obj)
-        return
+
+    def dehydrate_users(self, bundle):
+        if bundle.data.get('users'):
+            log.debug(bundle.data.get('users'))
+            l_users = bundle.obj.users.all()
+        resource_uris = []
+        user_resource = UserResource()
+        for l_user in l_users:
+            resource_uris.append(user_resource.get_resource_uri(bundle_or_obj=l_user))
+        return resource_uris
 
 class UserProfileResource(ModelResource):
     user = fields.ToOneField('freeform_data.api.UserResource', 'user', related_name='userprofile')
@@ -80,6 +96,7 @@ class UserResource(ModelResource):
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
     userprofile = fields.ToOneField('freeform_data.api.UserProfileResource', 'userprofile', related_name='user')
     organizations = fields.ToManyField('freeform_data.api.OrganizationResource', 'organization_set', null=True)
+    memberships = fields.ToManyField("freeform_data.api.MembershipResource", 'membership_set', null=True)
     class Meta:
         queryset = User.objects.all()
         resource_name = 'user'
@@ -191,12 +208,15 @@ class EssayGradeResource(ModelResource):
     def apply_authorization_limits(self, request, object_list):
         return object_list.filter(essay__user_id=Q(request.user.id)|Q(user_id=request.user.id))
 
-def add_admin_user(user,organization):
-    user_count = organization.user_set.all().count()
-    if user_count==0:
-        membership = Membership(
-            user = user,
-            organization = instance,
-            role = UserRoles.administrator,
-        )
+def add_membership(user,organization):
+    users = organization.users.all()
+    membership = Membership(
+        user = user,
+        organization = organization,
+    )
+    if users.count()==0:
+        membership.role = UserRoles.administrator
         membership.save()
+    else:
+        membership.role = UserRoles.student
+    membership.save()

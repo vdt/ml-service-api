@@ -27,7 +27,7 @@ class Organization(models.Model):
     #TODO: Add in billing details, etc later, along with rules on when to ask
     premium_service_subscriptions = models.TextField(default=json.dumps([]))
     #Each organization can have many users, and a user can be in multiple organizations
-    users = models.ManyToManyField(User, blank=True,null=True, through="Membership")
+    users = models.ManyToManyField(User, blank=True,null=True, through="freeform_data.Membership")
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
