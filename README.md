@@ -18,6 +18,24 @@ The key technologies that are utilized in this API wrapper are:
 Note that you will need the machine-learning repository to use all of the functionality here.  This repo is currently internal to edX, but will
 hopefully be open sourced shortly.  Until then, the API can be used, but the celery tasks will not work.
 
+How to Contribute
+-----------------------
+Contributions are very welcome.  The easiest way is to fork this repo, and then make a pull request from your fork.
+
+### Backlog as of 2/28
+
+* Add in html serialization/deserialization for API views
+* Add in permissions model
+* Add way train "one-off" models for topicality, etc.
+* Better tests (really, any tests)
+* Documentation, particularly for installation
+* A way to ensure that users belong to at least one organization
+* Models to track activity across an organization
+* Analytics views for api
+* Add required/excluded fields to API resources
+* Auth.json and env.json for deployment
+
+
 Installation
 ----------------------
 Please see install_notes.txt in the documentation directory for more detailed install information.
@@ -109,21 +127,3 @@ multiple essay grades.
 This is the basic unit that represents a single grader grading an essay.  Graders can be of multiple types (human,
 machine, etc), and can give varying scores and feedback.  Each essaygrade is associated with a single user (if
 human graded), and a single essay.
-
-How to Contribute
------------------------
-Contributions are very welcome.  The easiest way is to fork this repo, and then make a pull request from your fork.
-
-### Backlog as of 2/28
-
-* Add in html serialization/deserialization for API views
-* Add in permissions model
-* Add way train "one-off" models for topicality, etc.
-* Better tests (really, any tests)
-* Documentation, particularly for installation
-* A way to ensure that users belong to at least one organization
-* Models to track activity across an organization
-* Analytics views for api
-* Add required/excluded fields to API resources
-* Auth.json and env.json for deployment
-

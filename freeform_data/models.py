@@ -1,15 +1,15 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+from django.contrib.auth.models import User, Group, Permission
 from tastypie.models import create_api_key
 import json
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, pre_save, post_save, post_delete
 
 class UserRoles():
     student = "student"
     teacher = "teacher"
     administrator = "administrator"
     grader = "grader"
+    creator = "creator"
 
 class EssayTypes():
     test = "test"
@@ -27,9 +27,14 @@ class Organization(models.Model):
     #TODO: Add in billing details, etc later, along with rules on when to ask
     premium_service_subscriptions = models.TextField(default=json.dumps([]))
     #Each organization can have many users, and a user can be in multiple organizations
-    users = models.ManyToManyField(User, blank=True,null=True)
+    users = models.ManyToManyField(User, blank=True,null=True, through="Membership")
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+class Membership(models.Model):
+    role = models.CharField(max_length=20, default=UserRoles.student)
+    organization = models.ForeignKey(Organization)
+    user = models.ForeignKey(User)
 
 class UserProfile(models.Model):
     #TODO: Add in a callback where if user identifies as "administrator", then they can create an organization
@@ -113,29 +118,6 @@ class EssayGrade(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
-class Group(models.Model):
-    userprofile = models.ForeignKey(UserProfile)
-    class Meta:
-        abstract = True
-
-class StudentGroup(Group):
-    pass
-
-class TeacherGroup(Group):
-    pass
-
-class AdministratorGroup(Group):
-    pass
-
-class GraderGroup(Group):
-    pass
-
-USER_ROLE_MAPPINGS = {
-    UserRoles.student : StudentGroup,
-    UserRoles.teacher : TeacherGroup,
-    UserRoles.administrator : AdministratorGroup,
-    UserRoles.grader : GraderTypes,
-    }
 
 def create_user_profile(sender, instance, created, **kwargs):
     """
@@ -179,29 +161,41 @@ def pre_delete_user(sender,instance,**kwargs):
     essays.update(user=None)
     essay_grades.update(user=None)
 
-def create_permission_group(sender,instance, **kwargs):
-    """
-    Creates a permission group for a given user
-    """
-    try:
-        role_group = USER_ROLE_MAPPINGS[instance.role]
-    except:
-        role_group = StudentGroup
+def add_user_to_groups(sender,instance,**kwargs):
+    user = instance.user
+    org = instance.organization
+    group_name = get_group_name(membership)
+    if not Group.objects.filter(name=group_name).exists():
+        group = Group.objects.create(name=group_name)
+        group.save()
+    else:
+        group = Group.objects.get(name=group_name)
+    user.groups.add(group)
+    user.save()
 
-    role_group = role_group(
-        userprofile = instance,
-    )
-    role_group.save()
+def remove_user_from_groups(sender,instance,**kwargs):
+    user = instance.user
+    org = instance.organization
+    group_name = get_group_name(membership)
+    user.groups.filter(name=group_name).delete()
+    user.save()
+
+def get_group_name(membership):
+    group_name = "{0}_{1}".format(membership.org.id,membership.role)
+    return group_name
 
 #Django signals called after models are handled
+pre_save.connect(remove_user_from_groups, sender=Membership)
+
 post_save.connect(create_user_profile, sender=User)
 post_save.connect(create_api_key, sender=User)
-post_save.connect(create_permission_group,sender=UserProfile)
+post_save.connect(add_user_to_groups, sender=Membership)
 
 pre_delete.connect(pre_delete_problem,sender=Problem)
 pre_delete.connect(pre_delete_essay,sender=Essay)
 pre_delete.connect(pre_delete_essaygrade,sender=EssayGrade)
 pre_delete.connect(pre_delete_user, sender=User)
+pre_delete.connect(remove_user_from_groups, sender=Membership)
 
 #Maps the get_profile() function of a user to an attribute profile
 User.profile = property(lambda u: u.get_profile())

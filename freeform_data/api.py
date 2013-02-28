@@ -1,5 +1,5 @@
 from tastypie.resources import ModelResource
-from freeform_data.models import Organization, UserProfile, Course, Problem, Essay, EssayGrade
+from freeform_data.models import Organization, UserProfile, Course, Problem, Essay, EssayGrade, Membership
 from django.contrib.auth.models import User
 from tastypie.authorization import Authorization
 from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication, MultiAuthentication
@@ -96,6 +96,22 @@ class UserResource(ModelResource):
         log.debug("Applying limits.")
         return object_list.filter(user_id=request.user.id)
 
+class MembershipResource(ModelResource):
+    user = fields.ToOneField('freeform_data.api.UserResource', 'user')
+    organization = fields.ToOneField('freeform_data.api.OrganizationResource', 'organization')
+    class Meta:
+        queryset = Membership.objects.all()
+        resource_name = 'membership'
+
+        serializer = default_serialization()
+        authorization= default_authorization()
+        authentication = default_authentication()
+
+    def obj_create(self, bundle, request=None, **kwargs):
+        return super(MembershipResource, self).obj_create(bundle,user=bundle.request.user)
+
+    def apply_authorization_limits(self, request, object_list):
+        return object_list.filter(user_id=request.user.id)
 
 class CourseResource(ModelResource):
     organizations = fields.ToManyField(OrganizationResource, 'organizations', null=True)
