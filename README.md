@@ -125,4 +125,5 @@ Contributions are very welcome.  The easiest way is to fork this repo, and then 
 * Models to track activity across an organization
 * Analytics views for api
 * Add required/excluded fields to API resources
+* Auth.json and env.json for deployment
 
