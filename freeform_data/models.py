@@ -164,7 +164,7 @@ def pre_delete_user(sender,instance,**kwargs):
 def add_user_to_groups(sender,instance,**kwargs):
     user = instance.user
     org = instance.organization
-    group_name = get_group_name(membership)
+    group_name = get_group_name(instance)
     if not Group.objects.filter(name=group_name).exists():
         group = Group.objects.create(name=group_name)
         group.save()
@@ -176,12 +176,12 @@ def add_user_to_groups(sender,instance,**kwargs):
 def remove_user_from_groups(sender,instance,**kwargs):
     user = instance.user
     org = instance.organization
-    group_name = get_group_name(membership)
+    group_name = get_group_name(instance)
     user.groups.filter(name=group_name).delete()
     user.save()
 
 def get_group_name(membership):
-    group_name = "{0}_{1}".format(membership.org.id,membership.role)
+    group_name = "{0}_{1}".format(membership.organization.id,membership.role)
     return group_name
 
 #Django signals called after models are handled
