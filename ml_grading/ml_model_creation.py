@@ -33,7 +33,6 @@ def handle_single_problem(problem):
             essay_text.append(essay_text_vals[i]['essay_text'])
         except:
             log.exception("Could not get latest instructor scored for {0}".format(essays[i]))
-    log.debug(essay_grades)
 
     try:
         essay_text = [et.encode('ascii', 'ignore') for et in essay_text]
@@ -55,7 +54,7 @@ def handle_single_problem(problem):
 
     graded_sub_count = len(essay_text)
     if graded_sub_count < MIN_ESSAYS_TO_TRAIN_WITH:
-        error_message = "Too few too create a model for problem {0}".format(problem)
+        error_message = "Too few too create a model for problem {0}  need {1} only have {2}".format(problem, MIN_ESSAYS_TO_TRAIN_WITH, graded_sub_count)
         log.error(error_message)
         return False, error_message
 
@@ -76,15 +75,17 @@ def handle_single_problem(problem):
 
         #Retrain if no model exists, or every 10 graded essays.
         if not success or sub_count_diff>=10:
+            log.info("Starting to create a model because none exists or it is time to retrain.")
             #Checks to see if another model creator process has started amodel for this location
             success, model_started, created_model = ml_grading_util.check_if_model_started(problem)
 
             #Checks to see if model was started a long time ago, and removes and retries if it was.
             if model_started:
+                log.info("A model was started previously.")
                 now = timezone.now()
                 second_difference = (now - created_model.modified).total_seconds()
                 if second_difference > settings.TIME_BEFORE_REMOVING_STARTED_MODEL:
-                    log.error("Model for problem {0} started over {1} seconds ago, removing and re-attempting.".format(
+                    log.info("Model for problem {0} started over {1} seconds ago, removing and re-attempting.".format(
                         problem_id, settings.TIME_BEFORE_REMOVING_STARTED_MODEL))
                     created_model.delete()
                     model_started = False
