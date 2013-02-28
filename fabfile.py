@@ -18,6 +18,7 @@ def deploy():
     database_dir = '/opt/wwc/db'
     remote_ssh_dir = '/home/vik/.ssh'
     local_dir = '/home/vik/mitx_all'
+    sudo('sysctl vm.overcommit_memory=1')
     with lcd(local_dir), settings(warn_only=True):
         with cd(remote_ssh_dir):
             put('service-id_rsa','id_rsa', use_sudo=True)
