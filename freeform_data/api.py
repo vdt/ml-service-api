@@ -28,6 +28,7 @@ class CreateUserResource(ModelResource):
         authorization = Authorization()
         include_resource_uri = False
         fields = ['username']
+        resource_name = 'create_user'
 
     def obj_create(self, bundle, request=None, **kwargs):
         try:
