@@ -91,6 +91,8 @@ class UserResource(ModelResource):
 
 
 class CourseResource(ModelResource):
+    organization = fields.ForeignKey(OrganizationResource, 'organization', null=True)
+    users = fields.ManytoManyField(UserResource, 'users', null=True)
     class Meta:
         queryset = Course.objects.all()
         resource_name = 'course'
