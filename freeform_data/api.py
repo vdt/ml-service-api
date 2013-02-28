@@ -31,7 +31,7 @@ class CreateUserResource(ModelResource):
         authentication = Authentication()
         authorization = Authorization()
         fields = ['username']
-        resource_name = "create_user"
+        resource_name = "createuser"
 
     def obj_create(self, bundle, **kwargs):
         username, password = bundle.data['username'], bundle.data['password']
@@ -59,7 +59,7 @@ class UserProfileResource(ModelResource):
     user = fields.ToOneField('freeform_data.api.UserResource', 'user', related_name='userprofile')
     class Meta:
         queryset = UserProfile.objects.all()
-        resource_name = 'user_profile'
+        resource_name = 'userprofile'
 
         serializer = default_serialization()
         authorization= default_authorization()
@@ -145,8 +145,8 @@ class EssayResource(ModelResource):
         authentication = default_authentication()
 
     def obj_create(self, bundle, **kwargs):
-        bundle = super(EssayGradeResource, self).obj_create(bundle, user=bundle.request.user)
-        bundle.obj.user = request.user
+        bundle = super(EssayResource, self).obj_create(bundle, user=bundle.request.user)
+        bundle.obj.user = bundle.request.user
         bundle.obj.save()
 
     def apply_authorization_limits(self, request, object_list):
@@ -157,7 +157,7 @@ class EssayGradeResource(ModelResource):
     essay = fields.ToOneField(EssayResource, 'essay')
     class Meta:
         queryset = EssayGrade.objects.all()
-        resource_name = 'essay_grade'
+        resource_name = 'essaygrade'
 
         serializer = default_serialization()
         authorization= default_authorization()
@@ -165,7 +165,7 @@ class EssayGradeResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(EssayGradeResource, self).obj_create(bundle, user=bundle.request.user)
-        bundle.obj.user = request.user
+        bundle.obj.user = bundle.request.user
         bundle.obj.save()
         return bundle
 
