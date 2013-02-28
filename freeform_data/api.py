@@ -43,6 +43,7 @@ class CreateUserResource(ModelResource):
 
 class OrganizationResource(ModelResource):
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
+    users = fields.ToManyField('freeform_data.api.UserResource', 'users', null=True)
     class Meta:
         queryset = Organization.objects.all()
         resource_name = 'organization'
@@ -75,6 +76,7 @@ class UserResource(ModelResource):
     essays = fields.ToManyField('freeform_data.api.EssayResource', 'essay_set', null=True, related_name='user')
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
     userprofile = fields.ToOneField('freeform_data.api.UserProfileResource', 'userprofile', related_name='user')
+    organizations = fields.ToManyField('freeform_data.api.OrganizationResource', 'organization_set', null=True)
     class Meta:
         queryset = User.objects.all()
         resource_name = 'user'
@@ -111,7 +113,7 @@ class CourseResource(ModelResource):
         return super(CourseResource, self).obj_create(bundle, user=bundle.request.user)
 
     def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(organization=request.user.profile.organization)
+        return object_list.filter(organization__in=request.user.organization)
 
 class ProblemResource(ModelResource):
     essays = fields.ToManyField('freeform_data.api.EssayResource', 'essay_set', null=True, related_name='problem')
@@ -128,7 +130,7 @@ class ProblemResource(ModelResource):
         return super(ProblemResource, self).obj_create(bundle)
 
     def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(course__in=request.user.profile.organization.course_set)
+        return object_list.filter(course__in=request.user.organization.course_set)
 
 class EssayResource(ModelResource):
     essaygrades = fields.ToManyField('freeform_data.api.EssayGradeResource', 'essaygrade_set', null=True, related_name='essay')
