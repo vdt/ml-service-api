@@ -11,3 +11,5 @@ path.py
 fabric
 gunicorn
 requests
+sphinx
+django-sphinx-autodoc

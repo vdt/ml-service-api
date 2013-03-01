@@ -43,9 +43,10 @@ class CreateUserResource(ModelResource):
 
 class OrganizationResource(ModelResource):
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
-    #users = fields.ToManyField('freeform_data.api.UserResource', 'users', null=True)
+    #This maps the organization users to the users model via membership
     user_query = lambda bundle: bundle.obj.users.through.objects.all() or bundle.obj.users
     users = fields.ToManyField("freeform_data.api.MembershipResource", attribute=user_query, null=True)
+    #Also show members in the organization (useful for getting role)
     memberships = fields.ToManyField("freeform_data.api.MembershipResource", 'membership_set', null=True)
     class Meta:
         queryset = Organization.objects.all()
@@ -57,14 +58,21 @@ class OrganizationResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(OrganizationResource, self).obj_create(bundle)
-        #bundle.obj.save()
         return bundle
 
     def save_m2m(self,bundle):
+        """
+        Save_m2m saves many to many models.  This hack adds a membership object, which is needed, as membership
+        is the relation through which organization is connected to user.
+        """
         add_membership(bundle.request.user, bundle.obj)
         bundle.obj.save()
 
     def dehydrate_users(self, bundle):
+        """
+        Tastypie will currently show memberships instead of users due to the through relation.
+        This hacks the relation to show users.
+        """
         if bundle.data.get('users'):
             log.debug(bundle.data.get('users'))
             l_users = bundle.obj.users.all()

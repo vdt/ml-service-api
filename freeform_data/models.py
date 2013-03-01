@@ -4,6 +4,8 @@ from tastypie.models import create_api_key
 import json
 from django.db.models.signals import pre_delete, pre_save, post_save, post_delete
 
+#CLASSES THAT WRAP CONSTANTS
+
 class UserRoles():
     student = "student"
     teacher = "teacher"
@@ -19,6 +21,8 @@ class GraderTypes():
     machine = "ML"
     instructor = "IN"
     peer = "PE"
+
+#MODELS
 
 class Organization(models.Model):
     #TODO: Add in address info, etc later on
@@ -118,6 +122,8 @@ class EssayGrade(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+
+#MODEL SIGNAL CALLBACKS
 
 def create_user_profile(sender, instance, created, **kwargs):
     """
