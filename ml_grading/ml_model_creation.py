@@ -11,7 +11,6 @@ import time
 import json
 import logging
 import sys
-from statsd import statsd
 import pickle
 from ml_grading.models import CreatedModel
 from ml_grading import ml_grading_util
