@@ -13,7 +13,6 @@ import logging
 import sys
 import os
 from path import path
-from statsd import statsd
 import pickle
 
 log=logging.getLogger(__name__)

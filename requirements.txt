@@ -13,3 +13,5 @@ gunicorn
 requests
 sphinx
 django-sphinx-autodoc
+dogstatsd-python
+boto
