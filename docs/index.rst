@@ -9,7 +9,7 @@ ML API Documentation
 Installation and Usage
 ---------------------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation/installation_overview
    installation/install_notes
@@ -18,15 +18,15 @@ Installation and Usage
 API
 ---------------------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    api/api_structure
    api/api_models
 
-Key Functions
+Module Documentation
 ---------------------------------
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    ml_grading
    freeform_data
