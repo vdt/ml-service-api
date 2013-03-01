@@ -15,18 +15,8 @@ How to Contribute
 -----------------------
 Contributions are very welcome.  The easiest way is to fork this repo, and then make a pull request from your fork.
 
-### Backlog as of 2/28
-
-* Add in html serialization/deserialization for API views
-* Add in permissions model
-* Add way train "one-off" models for topicality, etc.
-* Better tests (really, any tests)
-* Documentation, particularly for installation
-* A way to ensure that users belong to at least one organization
-* Models to track activity across an organization
-* Analytics views for api
-* Add required/excluded fields to API resources
-* Auth.json and env.json for deployment
+The current backlog is in the [issues section](http://github.com/edx/ml-service-api/issues?labels=&page=1&state=open).
+Please feel free to open new issues or work on existing ones.
 
 Detailed Information
 -------------------------
