@@ -1,3 +1,4 @@
+=================================================
 API Structure
 =================================================
 The API is structured around Django models.  Tastypie abstracts the API into model resources.  These resources allow

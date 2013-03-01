@@ -3,11 +3,28 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to ML API's documentation!
+ML API Documentation
 ==================================
 
-Contents:
+Installation and Usage
+---------------------------------
+.. toctree::
+   :maxdepth: 2
 
+   installation/installation_overview
+   installation/install_notes
+   installation/usage
+
+API
+---------------------------------
+.. toctree::
+   :maxdepth: 2
+
+   api/api_structure
+   api/api_models
+
+Key Functions
+---------------------------------
 .. toctree::
    :maxdepth: 2
 
