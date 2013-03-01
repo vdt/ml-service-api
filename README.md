@@ -18,9 +18,26 @@ The key technologies that are utilized in this API wrapper are:
 Note that you will need the machine-learning repository to use all of the functionality here.  This repo is currently internal to edX, but will
 hopefully be open sourced shortly.  Until then, the API can be used, but the celery tasks will not work.
 
+How to Contribute
+-----------------------
+Contributions are very welcome.  The easiest way is to fork this repo, and then make a pull request from your fork.
+
+### Backlog as of 2/28
+
+* Add in html serialization/deserialization for API views
+* Add in permissions model
+* Add way train "one-off" models for topicality, etc.
+* Better tests (really, any tests)
+* Documentation, particularly for installation
+* A way to ensure that users belong to at least one organization
+* Models to track activity across an organization
+* Analytics views for api
+* Add required/excluded fields to API resources
+* Auth.json and env.json for deployment
+
+
 Installation
 ----------------------
-Please see install_notes.txt in the documentation directory for more detailed install information.
 Looking at fabfile.py is also a good idea of how to install this.  The commands in fabfile will take a system
 from a fresh start to a fully working install.
 The main steps are:
@@ -61,69 +78,11 @@ The postman add-on for Chrome is highly recommended to do this.
 Once you create a user, you will be able to interact with the various API resources.  I will get into how they
 are organized below.
 
-API Structure
------------------------
-The API is structured around Django models.  Tastypie abstracts the API into model resources.  These resources allow
-for GET/POST/PUT/DELETE operations on the models.  This allows for a very simple interface.  You may have also noted
-the ?format=json blocks earlier.  A variety of format can be used, including 'json', 'jsonp', 'xml', 'yaml', 'html', and 'plist'.
-Note that HTML will return a "not implemented yet" message.
-
-The available models are organization, userprofile, user, course, problem, essay, essaygrade.  Each model can be
-accessed via http://127.0.0.1:9000/essay_site/api/v1/MODEL_NAME_HERE/ Appending schema to the end of this will
-show you the available actions.
-
-By default, each user is restricted to only seeing the objects that they created.  This will be changed a bit when
-a permissions model is added.
-
-API Models
+Detailed Information
 -------------------------
+Please look in the documentation folder for more detailed documentation.
 
-### Organization
+Subdirectories of documentation:
 
-An organization defines a group of users.  This can be a school, university, set of friends, etc.  Each organization
-contains multiple courses, and multiple users.
-
-### User
-
-A user is the basic unit of the application.  Each user will belong to zero to many organizations, and will be a part of
-zero to many courses.  Each user also will be associated with any essays that they have written, and any essay grades
-that they have done.
-
-### Course
-
-The course is essentially a container for problems.  Each course can belong to zero to many organizations.  Each course
-has zero to many users, and zero to many problems.
-
-### Problem
-
-A problem contains meta-information for a problem, such as a prompt, maximum scores, etc.  It contains zero to many essays,
-and is a part of zero to many courses.
-
-### Essay
-
-The essay is the basic unit of written work.  Each essay is associated with a single problem and a single user.  It can have
-multiple essay grades.
-
-### EssayGrade
-
-This is the basic unit that represents a single grader grading an essay.  Graders can be of multiple types (human,
-machine, etc), and can give varying scores and feedback.  Each essaygrade is associated with a single user (if
-human graded), and a single essay.
-
-How to Contribute
------------------------
-Contributions are very welcome.  The easiest way is to fork this repo, and then make a pull request from your fork.
-
-### Backlog as of 2/28
-
-* Add in html serialization/deserialization for API views
-* Add in permissions model
-* Add way train "one-off" models for topicality, etc.
-* Better tests (really, any tests)
-* Documentation, particularly for installation
-* A way to ensure that users belong to at least one organization
-* Models to track activity across an organization
-* Analytics views for api
-* Add required/excluded fields to API resources
-* Auth.json and env.json for deployment
-
+* api has information on the api, such as structure and models.
+* installation should have some more detailed install instructions down the line, but is sparse for now.
