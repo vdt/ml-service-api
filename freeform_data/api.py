@@ -16,15 +16,28 @@ import logging
 log=logging.getLogger(__name__)
 
 def default_authorization():
+    """
+    Used to ensure that changing authorization can be done on a sitewide level easily.
+    """
     return Authorization()
 
 def default_authentication():
+    """
+    Ensures that authentication can easily be changed on a sitewide level.
+    """
     return MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
 
 def default_serialization():
+    """
+    Current serialization formats.  HTML is not supported for now.
+    """
     return Serializer(formats=['json', 'jsonp', 'xml', 'yaml', 'html', 'plist'])
 
 class CreateUserResource(ModelResource):
+    """
+    Creates a user with the specified username and password.  This is needed because of permissions restrictions
+    on the normal user resource.
+    """
     class Meta:
         allowed_methods = ['post']
         object_class = User
@@ -42,6 +55,9 @@ class CreateUserResource(ModelResource):
         return bundle
 
 class OrganizationResource(ModelResource):
+    """
+    Preserves appropriate many to many relationships, and encapsulates the Organization model.
+    """
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
     #This maps the organization users to the users model via membership
     user_query = lambda bundle: bundle.obj.users.through.objects.all() or bundle.obj.users
@@ -83,6 +99,9 @@ class OrganizationResource(ModelResource):
         return resource_uris
 
 class UserProfileResource(ModelResource):
+    """
+    Encapsulates the UserProfile module
+    """
     user = fields.ToOneField('freeform_data.api.UserResource', 'user', related_name='userprofile')
     class Meta:
         queryset = UserProfile.objects.all()
@@ -99,6 +118,9 @@ class UserProfileResource(ModelResource):
         return object_list.filter(user_id=request.user.id)
 
 class UserResource(ModelResource):
+    """
+    Encapsulates the User Model
+    """
     essaygrades = fields.ToManyField('freeform_data.api.EssayGradeResource', 'essaygrade_set', null=True, related_name='user')
     essays = fields.ToManyField('freeform_data.api.EssayResource', 'essay_set', null=True, related_name='user')
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
@@ -125,6 +147,9 @@ class UserResource(ModelResource):
         return object_list.filter(user_id=request.user.id)
 
 class MembershipResource(ModelResource):
+    """
+    Encapsulates the Membership Model
+    """
     user = fields.ToOneField('freeform_data.api.UserResource', 'user')
     organization = fields.ToOneField('freeform_data.api.OrganizationResource', 'organization')
     class Meta:
@@ -142,6 +167,9 @@ class MembershipResource(ModelResource):
         return object_list.filter(user_id=request.user.id)
 
 class CourseResource(ModelResource):
+    """
+    Encapsulates the Course Model
+    """
     organizations = fields.ToManyField(OrganizationResource, 'organizations', null=True)
     users = fields.ToManyField(UserResource, 'users', null=True)
     problems = fields.ToManyField('freeform_data.api.ProblemResource', 'problem_set', null=True)
@@ -160,6 +188,9 @@ class CourseResource(ModelResource):
         return object_list.filter(organization__in=request.user.organizations)
 
 class ProblemResource(ModelResource):
+    """
+    Encapsulates the problem Model
+    """
     essays = fields.ToManyField('freeform_data.api.EssayResource', 'essay_set', null=True, related_name='problem')
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'courses')
     class Meta:
@@ -177,6 +208,9 @@ class ProblemResource(ModelResource):
         return object_list.filter(course__in=request.user.organizations.courses)
 
 class EssayResource(ModelResource):
+    """
+    Encapsulates the essay Model
+    """
     essaygrades = fields.ToManyField('freeform_data.api.EssayGradeResource', 'essaygrade_set', null=True, related_name='essay')
     user = fields.ToOneField(UserResource, 'user', null=True)
     problem = fields.ToOneField(ProblemResource, 'problem')
@@ -197,6 +231,9 @@ class EssayResource(ModelResource):
         return object_list.filter(user_id=request.user.id)
 
 class EssayGradeResource(ModelResource):
+    """
+    Encapsulates the EssayGrade Model
+    """
     user = fields.ToOneField(UserResource, 'user', null=True)
     essay = fields.ToOneField(EssayResource, 'essay')
     class Meta:
@@ -217,12 +254,17 @@ class EssayGradeResource(ModelResource):
         return object_list.filter(essay__user_id=Q(request.user.id)|Q(user_id=request.user.id))
 
 def add_membership(user,organization):
+    """
+    Adds a membership object.  Required because membership defines the relation between user and organization,
+    and tastypie does not automatically create through relations.
+    """
     users = organization.users.all()
     membership = Membership(
         user = user,
         organization = organization,
     )
     if users.count()==0:
+        #If a user is the first one in an organization, make them the administrator.
         membership.role = UserRoles.administrator
         membership.save()
     else:
