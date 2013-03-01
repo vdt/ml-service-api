@@ -32,3 +32,5 @@ Detailed Information
 -------------------------
 Please look in the docs folder for more detailed documentation.  There is a README there that explains how to build
 and view the docs.
+
+You can also see the latest documentation at [ReadtheDocs](http://ml-api.readthedocs.org/en/latest/) .
