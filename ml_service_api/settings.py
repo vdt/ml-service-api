@@ -23,6 +23,7 @@ USE_S3_TO_STORE_MODELS= False #Determines whether or not models are placed in Am
 S3_BUCKETNAME="OpenEnded"
 TIME_BEFORE_REMOVING_STARTED_MODEL = 10 * 60 * 60 # in seconds, time before removing an ml model that was started (assume it wont finish)
 
+LOGIN_REDIRECT_URL = "/essay_site/api/v1/?format=json"
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -93,6 +94,17 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+PIPELINE_JS = {
+    'course': {
+        'source_filenames': (
+            'js/course/jquery.js',
+            ),
+        'output_filename': 'js/course.js',
+        }
+}
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -130,6 +142,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath(REPO_PATH / "templates"),
+    os.path.abspath(REPO_PATH / "freeform_data")
 )
 
 INSTALLED_APPS = (
@@ -148,6 +162,7 @@ INSTALLED_APPS = (
     'south',
     'ml_grading',
     'djcelery',
+    'pipeline'
 )
 
 # A sample logging configuration. The only tangible logging

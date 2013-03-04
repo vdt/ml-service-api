@@ -2,7 +2,7 @@ from tastypie.resources import ModelResource, Resource
 from freeform_data.models import Organization, UserProfile, Course, Problem, Essay, EssayGrade, Membership, UserRoles
 from django.contrib.auth.models import User
 from tastypie.authorization import Authorization
-from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication, MultiAuthentication
+from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication, MultiAuthentication,SessionAuthentication
 from tastypie import fields
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
@@ -25,7 +25,7 @@ def default_authentication():
     """
     Ensures that authentication can easily be changed on a sitewide level.
     """
-    return MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
+    return MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication())
 
 def default_serialization():
     """

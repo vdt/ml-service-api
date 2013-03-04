@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    <script src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script src="http://ajax.cdnjs.com/ajax/libs/underscore.js/1.1.6/underscore-min.js"></script>
+    <script src="http://ajax.cdnjs.com/ajax/libs/backbone.js/0.3.3/backbone-min.js"></script>
+    <title>ML API</title>
+    <meta name="csrf-token" content="{{csrf_token}}">
+    <div id="navbar">
+        {% block nav %}
+            <a href="/frontend/login">Login</a>
+            <a href="/frontend/logout">Logout</a>
+            <a href="/frontend/register">Register</a>
+        {% endblock %}
+    </div>
+</head>
+<body>
+
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

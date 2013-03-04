@@ -6,4 +6,5 @@ from django.conf.urls import patterns, include, url
 
 urlpatterns = patterns('',
     url(r'^essay_site/', include('freeform_data.urls')),
+    url(r'^frontend/', include('frontend.urls')),
 )
