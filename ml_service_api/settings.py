@@ -81,7 +81,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.abspath(REPO_PATH / "staticfiles")
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -92,18 +92,46 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath(REPO_PATH / 'css_js_src/'),
 )
 
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 PIPELINE_JS = {
     'course': {
-        'source_filenames': (
+        'source_filenames': [
             'js/course/jquery.js',
-            ),
-        'output_filename': 'js/course.js',
-        }
+            ],
+        'output_filename': 'course.js',
+    },
+    'util' : {
+        'source_filenames': [
+            'js/extend_backbone.js',
+            ],
+        'output_filename': 'js/util.js',
+    },
 }
+
+PIPELINE_CSS = {
+    'blueprint': {
+        'source_filenames': [
+            'css/ie.css',
+            'css/print.css',
+            'css/screen.css'
+            ],
+        'output_filename': 'css/blueprint.css',
+        },
+}
+
+
+PIPELINE_DISABLE_WRAPPER = True
+PIPELINE_YUI_BINARY = "yui-compressor"
+
+PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = None
+
+PIPELINE_COMPILE_INPLACE = True
+PIPELINE = True
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -121,6 +149,15 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
 )
 
 MIDDLEWARE_CLASSES = (

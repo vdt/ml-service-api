@@ -20,3 +20,4 @@ liblapack-dev
 libatlas-base-dev
 build-essential
 curl
+yui-compressor

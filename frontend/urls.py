@@ -14,6 +14,7 @@ urlpatterns +=patterns('frontend.views',
     url(r'^membership/$','membership'),
     url(r'^userprofile/$','userprofile'),
     url(r'^register/$','register'),
+    url(r'^$','index'),
 )
 
 

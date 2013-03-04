@@ -8,3 +8,4 @@ test_data/
 _build/
 tmpfile
 celerybeat-schedule
+staticfiles/

@@ -16,6 +16,9 @@ def register(request):
         'form': form,
         }))
 
+def index(request):
+    return render_to_response("index.html",{})
+
 def userprofile(request):
     pass
 
