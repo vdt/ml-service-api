@@ -23,7 +23,7 @@ def userprofile(request):
     pass
 
 def course(request):
-    pass
+    return render_to_response("course/course.html", {})
 
 def problem(request):
     pass
