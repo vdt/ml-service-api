@@ -98,28 +98,44 @@ STATICFILES_DIRS = (
 STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
 
 PIPELINE_JS = {
-    'course': {
-        'source_filenames': [
-            'js/course/jquery.js',
-            ],
-        'output_filename': 'course.js',
-    },
     'util' : {
         'source_filenames': [
+            'js/jquery-1.9.1.js',
+            'js/json2.js',
+            'js/underscore.js',
+            'js/backbone.js',
             'js/extend_backbone.js',
             ],
         'output_filename': 'js/util.js',
     },
+    'course' : {
+        'source_filenames': [
+            'js/models/course.js',
+            'js/views/course.js'
+            ],
+        'output_filename': 'js/course.js',
+    },
+
 }
 
 PIPELINE_CSS = {
-    'blueprint': {
+    'blueprint_ie': {
         'source_filenames': [
             'css/ie.css',
-            'css/print.css',
-            'css/screen.css'
             ],
-        'output_filename': 'css/blueprint.css',
+        'output_filename': 'css/ie.css',
+        },
+    'blueprint_print': {
+        'source_filenames': [
+            'css/print.css',
+            ],
+        'output_filename': 'css/print.css',
+        },
+    'blueprint_screen': {
+        'source_filenames': [
+            'css/screen.css',
+            ],
+        'output_filename': 'css/screen.css',
         },
 }
 
