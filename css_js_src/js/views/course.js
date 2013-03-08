@@ -49,7 +49,10 @@ CourseItemView = Backbone.View.extend({
         } else {
             var item_template = $('#course-item-detail-template');
             var html = (_.template(item_template.html(), {course: this.model, _:_}));
+            var update_template = $('#course-item-add-template');
+            var update_html = (_.template(update_template.html(), {course: this.model, _:_}));
             $(this.el).append(html);
+            $(this.el).append(update_html)
             $(this.el).data('detail', true)
         }
     },

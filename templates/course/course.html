@@ -14,6 +14,16 @@
                     Users : <%= course.get('users').length %>
                 </div>
             </script>
+            <script type="text/template" id="course-item-add-template">
+                <div id="item-add">
+                    <% _.each( key, function( item ){ %>
+                        Problems: <input type="text" id="problems"> <%= course.get('problems') %> </input>
+                        Organizations :<input type="text" id="organizations"> <%= course.get('organizations') %> </input>
+                        Users : <input type="text" id="users"> <%= course.get('users') %> </input>
+                        Name: <input type="text" id="name"> <%= course.get('course_name') %> </input>
+                    <% }); %>
+                </div>
+            </script>
         {% endverbatim %}
     </section>
 {% endblock %}
