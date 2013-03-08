@@ -31,7 +31,7 @@ CourseListView = Backbone.View.extend({
                 }
             }
         });
-    },
+    }
 });
 
 CourseItemView = Backbone.View.extend({

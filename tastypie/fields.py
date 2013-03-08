@@ -111,8 +111,9 @@ class ApiField(object):
         if self.attribute is not None:
             # Check for `__` in the field for looking through the relation.
             attrs = self.attribute.split('__')
-            log.debug(attrs)
+            log.debug(bundle)
             current_object = bundle.obj
+
             for attr in attrs:
                 previous_object = current_object
                 current_object = getattr(current_object, attr, None)

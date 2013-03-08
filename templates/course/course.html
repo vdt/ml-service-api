@@ -17,7 +17,7 @@
             <script type="text/template" id="course-item-add-template">
                 <div id="item-add">
                     <% for(key in course){ %>
-                        <%= key %>: <input type="text" id="<%= key %>" value="<%= course[key] %>" class="update"><br/>
+                        <%= key %>: <textarea rows="3" cols="100" type="text" id="<%= key %>" class="update"><%= course[key] %></textarea><br/>
                     <% }; %>
                     <a href="#" id="update">Update</a>
                 </div>
