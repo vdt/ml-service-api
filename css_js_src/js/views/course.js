@@ -37,20 +37,27 @@ CourseListView = Backbone.View.extend({
 CourseItemView = Backbone.View.extend({
     tagName: "li",
     events: {
-        "click a": "clicked"
+        "click a#show": "clicked",
+        "click #update": "update"
+    },
+
+    initialize: function(){
+        _.bindAll(this, "clicked", "render", "update");
     },
 
     clicked: function(e){
         e.preventDefault();
-        detail_shown = $(this.el).data('detail')
+        var detail_shown = $(this.el).data('detail')
         if(detail_shown){
             $(this.el).children("#item-detail").remove()
+            $(this.el).children("#item-add").remove()
             $(this.el).data('detail', false)
         } else {
             var item_template = $('#course-item-detail-template');
             var html = (_.template(item_template.html(), {course: this.model, _:_}));
             var update_template = $('#course-item-add-template');
-            var update_html = (_.template(update_template.html(), {course: this.model, _:_}));
+            console.log(this.model.toJSON());
+            var update_html = (_.template(update_template.html(), {course: this.model.toJSON(), _:_}));
             $(this.el).append(html);
             $(this.el).append(update_html)
             $(this.el).data('detail', true)
@@ -62,6 +69,22 @@ CourseItemView = Backbone.View.extend({
         var html = (_.template(item_template.html(), {course: this.model, _:_}));
         $(this.el).append(html);
         $(this.el).data('detail', false)
+    },
+
+    update: function() {
+        var update_elements = $(this.el).children('#item-add').children('.update');
+        var update_dict = {};
+        for(var el in update_elements)
+        {
+            var id = update_elements[el].id;
+            var value=update_elements[el].value;
+            if(id!="id" && id!="" && value!="" && id!="modified" && id!="created" && id!="resource_uri")
+            {
+                update_dict[id] = value;
+            }
+        }
+        console.log(update_dict);
+        this.model.save(update_dict, {patch: true});
     }
 });
 

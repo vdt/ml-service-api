@@ -4,7 +4,7 @@
         {%  verbatim %}
             <script type="text/template" id="course-item-template">
                 <div id="item-basic">
-                    <a href="<%= course.get('resource_uri') %>"><%= course.get('course_name') %> : <%= course.get('id') %>
+                    <a href="#" id="show"><%= course.get('course_name') %> : <%= course.get('id') %> </a>
                 </div>
             </script>
             <script type="text/template" id="course-item-detail-template">
@@ -16,12 +16,10 @@
             </script>
             <script type="text/template" id="course-item-add-template">
                 <div id="item-add">
-                    <% _.each( key, function( item ){ %>
-                        Problems: <input type="text" id="problems"> <%= course.get('problems') %> </input>
-                        Organizations :<input type="text" id="organizations"> <%= course.get('organizations') %> </input>
-                        Users : <input type="text" id="users"> <%= course.get('users') %> </input>
-                        Name: <input type="text" id="name"> <%= course.get('course_name') %> </input>
-                    <% }); %>
+                    <% for(key in course){ %>
+                        <%= key %>: <input type="text" id="<%= key %>" value="<%= course[key] %>" class="update"><br/>
+                    <% }; %>
+                    <a href="#" id="update">Update</a>
                 </div>
             </script>
         {% endverbatim %}

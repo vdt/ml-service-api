@@ -105,6 +105,7 @@ PIPELINE_JS = {
             'js/underscore.js',
             'js/backbone.js',
             'js/extend_backbone.js',
+            'js/jquery.cookie.js',
             ],
         'output_filename': 'js/util.js',
     },

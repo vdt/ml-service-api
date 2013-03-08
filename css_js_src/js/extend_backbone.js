@@ -15,3 +15,11 @@ TastypieCollection = Backbone.Collection.extend({
         return response.objects || response;
     }
 });
+
+$(function(){
+    var tokenValue = $.cookie('csrftoken');
+
+    $.ajaxSetup({
+        headers: {'X-CSRF-Token': tokenValue}
+    });
+})

@@ -1,8 +1,8 @@
 from tastypie.resources import ModelResource, Resource
 from freeform_data.models import Organization, UserProfile, Course, Problem, Essay, EssayGrade, Membership, UserRoles
 from django.contrib.auth.models import User
-from tastypie.authorization import Authorization
-from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication, MultiAuthentication,SessionAuthentication
+from tastypie.authorization import Authorization, DjangoAuthorization
+from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication, MultiAuthentication
 from tastypie import fields
 from django.conf.urls import url
 from tastypie.utils import trailing_slash
@@ -13,7 +13,26 @@ from tastypie.serializers import Serializer
 from django.db import IntegrityError
 from tastypie.exceptions import BadRequest
 import logging
+
 log=logging.getLogger(__name__)
+
+
+class SessionAuthentication(Authentication):
+    """
+    Override session auth to always return the auth status
+    """
+    def is_authenticated(self, request, **kwargs):
+        """
+        Checks to make sure the user is logged in & has a Django session.
+        """
+        return request.user.is_authenticated()
+
+    def get_identifier(self, request):
+        """
+        Provides a unique string identifier for the requestor.
+        This implementation returns the user's username.
+        """
+        return request.user.username
 
 def default_authorization():
     """
@@ -26,6 +45,7 @@ def default_authentication():
     Ensures that authentication can easily be changed on a sitewide level.
     """
     return MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication())
+    #return ApiKeyAuthentication()
 
 def default_serialization():
     """
@@ -279,3 +299,4 @@ def add_membership(user,organization):
     else:
         membership.role = UserRoles.student
     membership.save()
+
