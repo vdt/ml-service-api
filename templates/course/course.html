@@ -2,15 +2,17 @@
 {% block content %}
     <section class="course-view">
         {%  verbatim %}
-            <script type="text/template" id="course-list-template">
-                <% _.each(courses, function (course) { %>
-
-                    <li><a href="<%= course.get('resource_uri') %>"><%= course.get('course_name') %> : <%= course.get('id') %></li>
-
-                <% }); %>
-            </script>
             <script type="text/template" id="course-item-template">
-               <a href="<%= course.get('resource_uri') %>"><%= course.get('course_name') %> : <%= course.get('id') %>
+                <div id="item-basic">
+                    <a href="<%= course.get('resource_uri') %>"><%= course.get('course_name') %> : <%= course.get('id') %>
+                </div>
+            </script>
+            <script type="text/template" id="course-item-detail-template">
+                <div id="item-detail">
+                    Problems: <%= course.get('problems').length %>
+                    Organizations : <%= course.get('organizations').length %>
+                    Users : <%= course.get('users').length %>
+                </div>
             </script>
         {% endverbatim %}
     </section>
