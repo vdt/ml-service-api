@@ -27,7 +27,7 @@ CourseView = Backbone.View.extend({
     },
 });
 
-var CourseItemView = Backbone.View.extend({
+var CourseItemViewOld = Backbone.View.extend({
     tagName: 'li', // name of tag to be created
     initialize: function () {
         // isLoading is a useful flag to make sure we don't send off more than
@@ -54,7 +54,7 @@ var CourseItemView = Backbone.View.extend({
     }
 });
 
-var CourseListView = Backbone.View.extend({
+var CourseListViewOld = Backbone.View.extend({
     el: '.course-view', // el attaches to existing element
     events: {
         'click button#add': 'addItem'
@@ -105,7 +105,63 @@ var CourseListView = Backbone.View.extend({
     }
 });
 
+CourseListView = Backbone.View.extend({
+    tagName: "ul",
+    el: '.course-view',
+    initialize: function(){
+        _.bindAll(this, "renderItem", "loadResults");
+        this.courseList = new CourseList();
+    },
+
+    renderItem: function(model){
+        var courseItemView = new CourseItemView({model: model});
+        courseItemView.render();
+        $(this.el).append(courseItemView.el);
+    },
+
+    render: function(){
+        this.loadResults();
+    },
+
+    loadResults: function () {
+        var that = this;
+        // we are starting a new load of results so set isLoading to true
+        this.isLoading = true;
+        // fetch is Backbone.js native function for calling and parsing the collection url
+        this.courseList.fetch({
+            success: function (courses) {
+                // Once the results are returned lets populate our template
+                console.log(courses.models);
+                for(model in courses.models)
+                {
+                    that.renderItem(courses.models[model])
+                }
+            }
+        });
+    },
+});
+
+CourseItemView = Backbone.View.extend({
+    tagName: "li",
+    events: {
+        "click a": "clicked"
+    },
+
+    clicked: function(e){
+        e.preventDefault();
+        var name = this.model.get("name");
+        alert(name);
+    },
+
+    render: function(){
+        var template1 = $('#course-item-template');
+        var html = (_.template(template1.html(), {course: this.model, _:_}));
+        $(this.el).append(html);
+    }
+});
 
 $(document).ready(function() {
-    course_view = new CourseView()
+    //course_view = new CourseView()
+    var view = new CourseListView();
+    view.render();
 });

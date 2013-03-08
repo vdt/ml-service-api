@@ -5,9 +5,12 @@
             <script type="text/template" id="course-list-template">
                 <% _.each(courses, function (course) { %>
 
-                    <li><a href="<%= course.get('resource_uri') %>"><%= course.get('name') %> : <%= course.get('id') %></li>
+                    <li><a href="<%= course.get('resource_uri') %>"><%= course.get('course_name') %> : <%= course.get('id') %></li>
 
                 <% }); %>
+            </script>
+            <script type="text/template" id="course-item-template">
+               <a href="<%= course.get('resource_uri') %>"><%= course.get('course_name') %> : <%= course.get('id') %>
             </script>
         {% endverbatim %}
     </section>
