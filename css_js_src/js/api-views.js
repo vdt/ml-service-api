@@ -42,7 +42,8 @@ ItemView = Backbone.View.extend({
     events: {
         "click a#show": "clicked",
         "click #update": "update",
-        "click #add": "update"
+        "click #add": "update",
+        "click #delete": "delete"
     },
 
     initialize: function(){
@@ -94,5 +95,13 @@ ItemView = Backbone.View.extend({
             }
         }
         this.model.save(update_dict, {patch: true});
+        $(this.el).children().remove();
+        this.render();
+    },
+
+    delete: function () {
+        $(this.el).remove()
+        this.model.destroy();
+        this.remove();
     }
 });
