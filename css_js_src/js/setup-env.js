@@ -17,3 +17,24 @@ waitForSchema = function(fn, attemptsLeft) {
         fn();
     }
 }
+
+
+waitForModel= function(definedobj, fn,  attemptsLeft) {
+    var tick = attemptsLeft || 30;
+    try
+    {
+        eval(definedobj);
+        fn();
+    }
+    catch(err){
+        if (tick > 1) {
+            //recurse
+            setTimeout(function() {
+                waitForModel(definedobj, fn, tick - 1);
+            }, 100)
+        }
+        else {
+            console.log('Failed to load models.');
+        }
+    }
+}

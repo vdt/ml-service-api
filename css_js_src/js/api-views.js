@@ -3,8 +3,12 @@ ListView = Backbone.View.extend({
     el: '.list-view',
     collection: undefined,
     item: undefined,
+    events: {
+        "click #add": "addItemForm",
+        "click #save-new-item": "saveItem"
+    },
     initialize: function(){
-        _.bindAll(this, "renderItem", "loadResults");
+        _.bindAll(this, "renderItem", "loadResults", "addItemForm", "saveItem");
         this.courseList = new this.collection;
     },
 
@@ -16,6 +20,7 @@ ListView = Backbone.View.extend({
 
     render: function(){
         this.loadResults();
+        $(this.el).data('adding', false)
     },
 
     loadResults: function () {
@@ -33,6 +38,25 @@ ListView = Backbone.View.extend({
                 }
             }
         });
+    },
+    addItemForm : function() {
+        fields = {};
+        var that = this;
+        console.log(this.courseList.schema);
+        $.getJSON(this.courseList.schema , function(data){
+            for (var field in data['fields']){
+                fields[field] = ""
+            }
+            console.log(data);
+            var update_template = $('#generic-item-add-template');
+            var update_html = (_.template(update_template.html(), {item: fields, _:_}));
+            $(that.el).append(update_html)
+            $(that.el).data('adding', true)
+        });
+    },
+    saveItem: function() {
+        $(this.el).children("#item-add").remove()
+        $(this.el).data('adding', false)
     }
 });
 
@@ -42,12 +66,11 @@ ItemView = Backbone.View.extend({
     events: {
         "click a#show": "clicked",
         "click #update": "update",
-        "click #add": "update",
         "click #delete": "delete"
     },
 
     initialize: function(){
-        _.bindAll(this, "clicked", "render", "update");
+        _.bindAll(this, "clicked", "render", "update", "delete");
     },
 
     clicked: function(e){

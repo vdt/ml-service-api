@@ -1,4 +1,4 @@
-waitForSchema(function() {
+waitForModel("CourseContainer", function() {
 
     CourseItemView = ItemView.extend({
         templatename : "course"
@@ -10,6 +10,6 @@ waitForSchema(function() {
         item: CourseItemView
     });
 
-    var view = new CourseListView();
-    view.render();
+    var course_view = new CourseListView();
+    course_view.render();
 });

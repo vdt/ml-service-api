@@ -25,23 +25,16 @@
 
             _mdl['validator'] = {};
 
-
-            $.getJSON(_mdl['schema'] , function(data){
-                for (var field in data['fields']){
-                    _mdl['validator'][field] = {};
-                    _mdl['validator'][field]['type'] = data['fields']['type'];
-                    if (data['fields']['blank'] == false)
-                        _mdl['validator'][field]['required'] = true;
-                }
-            });
-
             window[_mdl['name']] = Backbone.Model.extend({
                 urlRoot: _mdl['url'],
-                validate:_mdl['validator']
+                validate: _mdl['validator'],
+                schema : _mdl['schema']
             });
+
             window[_mdl['container_name']] = Backbone.Collection.extend({
                 urlRoot: _mdl['url'],
-                model: window[_mdl['name']]
+                model: window[_mdl['name']],
+                schema : _mdl['schema']
             });
         }
     }
