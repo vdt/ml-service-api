@@ -108,6 +108,7 @@ PIPELINE_JS = {
             'js/backbone-tastypie.js',
             'js/backbone-schema.js',
             'js/setup-env.js',
+            'js/api-views.js',
             'js/jquery.cookie.js',
             ],
         'output_filename': 'js/util.js',
