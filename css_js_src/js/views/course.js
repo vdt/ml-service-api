@@ -76,8 +76,16 @@ CourseItemView = Backbone.View.extend({
         var update_dict = {};
         for(var el in update_elements)
         {
-            var id = update_elements[el].id;
+            var id = update_elements[el].id
             var value=update_elements[el].value;
+            try {
+                value = JSON.parse(value);
+            }
+            catch(err)
+            {
+                
+            }
+            console.log(value)
             if(id!="id" && id!="" && value!="" && id!="modified" && id!="created" && id!="resource_uri")
             {
                 update_dict[id] = value;
