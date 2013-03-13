@@ -14,6 +14,7 @@ Overview
 
    overview/description
    overview/goals
+   overview/contributing
 
 Installation and Usage
 ---------------------------------
