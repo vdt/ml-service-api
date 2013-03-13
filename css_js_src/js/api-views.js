@@ -110,7 +110,7 @@ ItemView = Backbone.View.extend({
     update: function() {
         var update_elements = $(this.el).children('#item-add').children('.update');
         var update_dict = this.update_base(update_elements)
-        this.model.save(update_dict, {patch: updating});
+        this.model.save(update_dict, {patch: true});
         $(this.el).children().remove();
         this.render();
     },
