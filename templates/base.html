@@ -26,6 +26,13 @@
             {% block nav %}
                 <a href="/frontend/">Home</a>
                 {% if user.is_authenticated %}
+                    <a href="/frontend/organization">Organization</a>
+                    <a href="/frontend/course">Course</a>
+                    <a href="/frontend/problem">Problem</a>
+                    <a href="/frontend/essay">Essay</a>
+                    <a href="/frontend/essaygrade">EssayGrade</a>
+                    <a href="/frontend/membership">Membership</a>
+                    Logged in as {{ user.username }}
                     <a href="/frontend/logout">Logout</a>
                 {% else %}
                     <a href="/frontend/login">Login</a>

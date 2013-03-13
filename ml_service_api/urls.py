@@ -10,6 +10,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = patterns('',
     url(r'^essay_site/', include('freeform_data.urls')),
     url(r'^frontend/', include('frontend.urls')),
+    url(r'^$', include('frontend.urls')),
 )
 
 if settings.DEBUG:

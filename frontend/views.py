@@ -17,13 +17,13 @@ def register(request):
         }))
 
 def index(request):
-    return render_to_response("index.html",{})
+    return render_to_response("index.html",RequestContext(request))
 
 def userprofile(request):
     pass
 
 def course(request):
-    return render_to_response("course/course.html", {})
+    return render_to_response("course/course.html", RequestContext(request))
 
 def problem(request):
     pass
