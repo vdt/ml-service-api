@@ -183,6 +183,13 @@ MIDDLEWARE_CLASSES = (
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+)
+
+ANONYMOUS_USER_ID = -1
+
 ROOT_URLCONF = 'ml_service_api.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
@@ -212,7 +219,8 @@ INSTALLED_APPS = (
     'south',
     'ml_grading',
     'djcelery',
-    'pipeline'
+    'pipeline',
+    'guardian',
 )
 
 # A sample logging configuration. The only tangible logging

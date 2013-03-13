@@ -18,3 +18,4 @@ django-sphinx-autodoc
 dogstatsd-python
 boto
 django-pipeline
+django-guardian
