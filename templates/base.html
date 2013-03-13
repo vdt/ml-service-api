@@ -3,7 +3,9 @@
     <head>
         {% load compressed %}
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
-        {% compressed_css 'blueprint' %}
+        {% compressed_css 'skeleton' %}
+        {% compressed_css 'base' %}
+        {% compressed_css 'layout' %}
         {% block additional_js %}
         {% endblock %}
         {% compressed_js 'util' %}
@@ -23,7 +25,7 @@
         </script>
      {% endverbatim %}
     <div class="container">
-        <div class="navbar span-24">
+        <div class="navbar sixteen columns">
             {% block nav %}
                 <a href="/frontend/">Home</a>
                 {% if user.is_authenticated %}
@@ -34,7 +36,7 @@
                 {% endif %}
             {% endblock %}
         </div>
-        <div class="span-24 content">
+        <div class="sixteen columns content">
             {% block content %}
             {% endblock %}
         </div>

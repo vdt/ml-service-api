@@ -126,21 +126,21 @@ PIPELINE_JS = {
 PIPELINE_CSS = {
     'blueprint_ie': {
         'source_filenames': [
-            'css/ie.css',
+            'css/skeleton.css',
             ],
-        'output_filename': 'css/ie.css',
+        'output_filename': 'css/skeleton.css',
         },
     'blueprint_print': {
         'source_filenames': [
-            'css/print.css',
+            'css/base.css',
             ],
-        'output_filename': 'css/print.css',
+        'output_filename': 'css/layout.css',
         },
     'blueprint_screen': {
         'source_filenames': [
-            'css/screen.css',
+            'css/layout.css',
             ],
-        'output_filename': 'css/screen.css',
+        'output_filename': 'css/base.css',
         },
 }
 

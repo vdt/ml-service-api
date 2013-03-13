@@ -4,7 +4,7 @@
         {%  verbatim %}
             <script type="text/template" id="course-item-template">
                 <div id="item-basic">
-                    <a href="#" id="show"><%= course.get('course_name') %> : <%= course.get('id') %> </a>
+                    <a href="#" id="show" class="button"><%= course.get('course_name') %> : <%= course.get('id') %> </a>
                 </div>
             </script>
             <script type="text/template" id="course-item-detail-template">
@@ -19,11 +19,11 @@
                     <% for(key in course){ %>
                         <%= key %>: <textarea rows="3" cols="100" type="text" id="<%= key %>" class="update"><%= course[key] %></textarea><br/>
                     <% }; %>
-                    <a href="#" id="update">Update</a>
-                    <a href="#" id="delete">Delete</a>
+                    <a href="#" id="update" class="button">Update</a>
+                    <a href="#" id="delete" class="button">Delete</a>
                 </div>
             </script>
         {% endverbatim %}
-        <a href="#" id="add">Add</a>
+        <a href="#" id="add" class="button">Add</a>
     </section>
 {% endblock %}
