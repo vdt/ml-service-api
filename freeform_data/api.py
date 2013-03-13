@@ -45,7 +45,6 @@ def default_authentication():
     Ensures that authentication can easily be changed on a sitewide level.
     """
     return MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication())
-    #return ApiKeyAuthentication()
 
 def default_serialization():
     """
@@ -61,6 +60,7 @@ class CreateUserResource(ModelResource):
     class Meta:
         allowed_methods = ['post']
         object_class = User
+        #No authentication for create user, or authorization.  Anyone can create.
         authentication = Authentication()
         authorization = Authorization()
         fields = ['username']

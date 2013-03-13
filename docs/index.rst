@@ -6,6 +6,15 @@
 ML API Documentation
 ==================================
 
+Overview
+---------------------------------
+
+.. toctree::
+   :maxdepth: 1
+
+   overview/description
+   overview/goals
+
 Installation and Usage
 ---------------------------------
 .. toctree::

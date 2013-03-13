@@ -99,8 +99,7 @@ def deploy():
     with prefix('source /opt/edx/bin/activate'), settings(warn_only=True):
         #sudo('apt-get build-dep python-scipy')
         #Numpy and scipy are a bit special in terms of how they install
-        run('pip install numpy')
-        run('pip install scipy')
+        run('pip install numpy==1.6.2')
         #This is needed to support the ml algorithm
         sudo('mkdir {0}'.format(nltk_data_dir))
         if not exists(nltk_data_dir):
