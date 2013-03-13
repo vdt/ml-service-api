@@ -16,13 +16,14 @@ ENV_ROOT = REPO_PATH.dirname()
 
 #ML Specific settings
 ML_PATH = os.path.join(ENV_ROOT, "machine-learning/") #Path to ML repo containing grade.py and create.py
-ML_MODEL_PATH=os.path.join(ENV_ROOT,"ml_models/") #Path to save and retrieve ML models from
+ML_MODEL_PATH=os.path.join(ENV_ROOT,"ml_models_api/") #Path to save and retrieve ML models from
 TIME_BETWEEN_ML_CREATOR_CHECKS= 1 * 60 # seconds.  Time between ML creator checking to see if models need to be made.
 TIME_BETWEEN_ML_GRADER_CHECKS= 10 # seconds.  Time between ML grader checking to see if models need to be made.
 USE_S3_TO_STORE_MODELS= False #Determines whether or not models are placed in Amazon S3
 S3_BUCKETNAME="OpenEnded"
 TIME_BEFORE_REMOVING_STARTED_MODEL = 10 * 60 * 60 # in seconds, time before removing an ml model that was started (assume it wont finish)
 
+LOGIN_REDIRECT_URL = "/frontend/"
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -80,7 +81,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.abspath(REPO_PATH / "staticfiles")
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -91,7 +92,59 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath(REPO_PATH / 'css_js_src/'),
 )
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineCachedStorage'
+
+PIPELINE_JS = {
+    'util' : {
+        'source_filenames': [
+            'js/jquery-1.9.1.js',
+            'js/json2.js',
+            'js/underscore.js',
+            'js/backbone.js',
+            'js/backbone.validations.js',
+            'js/backbone-tastypie.js',
+            'js/backbone-schema.js',
+            'js/setup-env.js',
+            'js/api-views.js',
+            'js/jquery.cookie.js',
+            ],
+        'output_filename': 'js/util.js',
+    }
+}
+
+API_MODELS = ["userprofile", "user", "membership", "course", "organization", "problem", "essay", "essaygrade"]
+
+for model in API_MODELS:
+    PIPELINE_JS[model] = {
+        'source_filenames': [
+            'js/views/{0}.js'.format(model)
+        ],
+        'output_filename': 'js/{0}.js'.format(model),
+    }
+
+PIPELINE_CSS = {
+    'skeleton': {
+        'source_filenames': [
+            'css/skeleton.css',
+            'css/base.css',
+            'css/layout.css',
+            ],
+        'output_filename': 'css/skeleton.css',
+        },
+}
+
+
+PIPELINE_DISABLE_WRAPPER = True
+PIPELINE_YUI_BINARY = "yui-compressor"
+
+PIPELINE_CSS_COMPRESSOR = None
+PIPELINE_JS_COMPRESSOR = None
+
+PIPELINE_COMPILE_INPLACE = True
+PIPELINE = True
 
 # List of finder classes that know how to find static files in
 # various locations.
@@ -109,6 +162,15 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -130,6 +192,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    os.path.abspath(REPO_PATH / "templates"),
+    os.path.abspath(REPO_PATH / "freeform_data")
 )
 
 INSTALLED_APPS = (
@@ -148,6 +212,7 @@ INSTALLED_APPS = (
     'south',
     'ml_grading',
     'djcelery',
+    'pipeline'
 )
 
 # A sample logging configuration. The only tangible logging

@@ -8,6 +8,9 @@ from django.core.urlresolvers import resolve
 from tastypie.bundle import Bundle
 from tastypie.exceptions import ApiFieldError, NotFound
 from tastypie.utils import dict_strip_unicode_keys, make_aware
+import logging
+
+log=logging.getLogger(__name__)
 
 
 class NOT_PROVIDED:
@@ -108,6 +111,7 @@ class ApiField(object):
         if self.attribute is not None:
             # Check for `__` in the field for looking through the relation.
             attrs = self.attribute.split('__')
+            log.debug(bundle)
             current_object = bundle.obj
 
             for attr in attrs:

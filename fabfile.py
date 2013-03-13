@@ -30,6 +30,7 @@ def deploy():
     remote_ssh_dir = '/home/vik/.ssh'
     local_dir = '/home/vik/mitx_all'
     nltk_data_dir = '/usr/share/nltk_data'
+    static_dir = '/opt/wwc/staticfiles'
 
     #this is needed for redis-server to function properly
     sudo('sysctl vm.overcommit_memory=1')
@@ -48,6 +49,9 @@ def deploy():
         #Stop services
         sudo('service celery stop')
         sudo('service ml-service-api stop')
+        static_dir_exists = exists(static_dir, use_sudo=True)
+        if not static_dir_exists:
+            sudo('mkdir {0}'.format(static_dir))
         repo_exists = exists(code_dir, use_sudo=True)
         #If the repo does not exist, then it needs to be cloned
         if not repo_exists:
@@ -109,6 +113,7 @@ def deploy():
             # Sync django db and migrate it using south migrations
             run('python manage.py syncdb --settings=ml_service_api.aws --pythonpath={0}'.format(code_dir))
             run('python manage.py migrate --settings=ml_service_api.aws --pythonpath={0}'.format(code_dir))
+            run('python manage.py collectstatic -c --noinput --settings=ml_service_api.aws --pythonpath={0}'.format(code_dir))
             sudo('chown -R www-data {0}'.format(up_one_level_dir))
 
         with cd(ml_code_dir):

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block additional_js %}
+    {% load compressed %}
+    {% compressed_js 'course' %}
+{% endblock %}
+{% block content %}
+    <section class="course-view">
+        {%  verbatim %}
+            <script type="text/template" id="course-item-template">
+                <div id="item-basic">
+                    <a href="#" id="show"><%= item.get('course_name') %> : <%= item.get('id') %> </a>
+                </div>
+            </script>
+            <script type="text/template" id="course-item-detail-template">
+                <div id="item-detail">
+                    Problems: <%= item.get('problems').length %>
+                    Organizations : <%= item.get('organizations').length %>
+                    Users : <%= item.get('users').length %>
+                </div>
+            </script>
+            <script type="text/template" id="course-item-add-template">
+                <div id="item-add">
+                    <% for(key in item){ %>
+                        <%= key %>: <textarea rows="3" cols="100" type="text" id="<%= key %>" class="update"><%= item[key] %></textarea><br/>
+                    <% }; %>
+                    <a href="#" id="update" class="button">Update</a>
+                    <a href="#" id="delete" class="button">Delete</a>
+                </div>
+            </script>
+        {% endverbatim %}
+        <a href="#" id="add" class="button">Add</a>
+    </section>
+{% endblock %}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load compressed %}
+        {% compressed_css 'skeleton' %}
+        {% compressed_js 'util' %}
+        {% block additional_js %}
+        {% endblock %}
+        <title>ML API</title>
+        <meta name="csrf-token" content="{{csrf_token}}">
+    </head>
+    <body>
+    {%  verbatim %}
+        <script type="text/template" id="generic-item-add-template">
+            <div id="item-add">
+                <% for(key in item){ %>
+                    <%= key %>: <textarea rows="3" cols="100" type="text" id="<%= key %>" class="new-item"><%= item[key] %></textarea><br/>
+                <% }; %>
+                <a href="#" id="save-new-item" class="button">Save</a>
+            </div>
+        </script>
+        <script type="text/template" id="pagination-template">
+            <div id="page-nav">
+                <% if(pages > 1) { %>
+                    <% if(prev) { %>
+                        <span>previous</span>
+                        <!-- <a href="#" id="prev">previous</a> -->
+                    <% } else { %>
+                        <span>previous</span>
+                    <% } %>
+                    <%= range[0] %>..<%= range[1] %> of <%= total %>
+
+                    <% if(next) { %>
+                        <a href="#" id="next">next</a>
+                    <% } else { %>
+                        <span>next</span>
+                    <% } %>
+                <% } %>
+            </div>
+        </script>
+     {% endverbatim %}
+    <div class="container">
+        <div class="navbar sixteen columns">
+            {% block nav %}
+                <a href="/frontend/">Home</a>
+                {% if user.is_authenticated %}
+                    <a href="/frontend/organization">Organization</a>
+                    <a href="/frontend/course">Course</a>
+                    <a href="/frontend/problem">Problem</a>
+                    <a href="/frontend/essay">Essay</a>
+                    <a href="/frontend/essaygrade">Essay Grade</a>
+                    <a href="/frontend/user">User</a>
+                    <a href="/frontend/userprofile">User Profile</a>
+                    <a href="/frontend/membership">Membership</a>
+                    Logged in as {{ user.username }}
+                    <a href="/frontend/logout">Logout</a>
+                {% else %}
+                    <a href="/frontend/login">Login</a>
+                    <a href="/frontend/register">Register</a>
+                {% endif %}
+            {% endblock %}
+        </div>
+        <div class="sixteen columns content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+
+    </body>
+</html>

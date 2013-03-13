@@ -1,7 +1,7 @@
 from tastypie.resources import ModelResource, Resource
 from freeform_data.models import Organization, UserProfile, Course, Problem, Essay, EssayGrade, Membership, UserRoles
 from django.contrib.auth.models import User
-from tastypie.authorization import Authorization
+from tastypie.authorization import Authorization, DjangoAuthorization
 from tastypie.authentication import Authentication, ApiKeyAuthentication, BasicAuthentication, MultiAuthentication
 from tastypie import fields
 from django.conf.urls import url
@@ -13,7 +13,26 @@ from tastypie.serializers import Serializer
 from django.db import IntegrityError
 from tastypie.exceptions import BadRequest
 import logging
+
 log=logging.getLogger(__name__)
+
+
+class SessionAuthentication(Authentication):
+    """
+    Override session auth to always return the auth status
+    """
+    def is_authenticated(self, request, **kwargs):
+        """
+        Checks to make sure the user is logged in & has a Django session.
+        """
+        return request.user.is_authenticated()
+
+    def get_identifier(self, request):
+        """
+        Provides a unique string identifier for the requestor.
+        This implementation returns the user's username.
+        """
+        return request.user.username
 
 def default_authorization():
     """
@@ -25,7 +44,8 @@ def default_authentication():
     """
     Ensures that authentication can easily be changed on a sitewide level.
     """
-    return MultiAuthentication(BasicAuthentication(), ApiKeyAuthentication())
+    return MultiAuthentication(SessionAuthentication(), ApiKeyAuthentication())
+    #return ApiKeyAuthentication()
 
 def default_serialization():
     """
@@ -45,6 +65,7 @@ class CreateUserResource(ModelResource):
         authorization = Authorization()
         fields = ['username']
         resource_name = "createuser"
+        always_return_data = True
 
     def obj_create(self, bundle, **kwargs):
         username, password = bundle.data['username'], bundle.data['password']
@@ -71,6 +92,7 @@ class OrganizationResource(ModelResource):
         serializer = default_serialization()
         authorization= default_authorization()
         authentication = default_authentication()
+        always_return_data = True
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(OrganizationResource, self).obj_create(bundle)
@@ -110,6 +132,7 @@ class UserProfileResource(ModelResource):
         serializer = default_serialization()
         authorization= default_authorization()
         authentication = default_authentication()
+        always_return_data = True
 
     def obj_create(self, bundle, request=None, **kwargs):
         return super(UserProfileResource, self).obj_create(bundle,user=bundle.request.user)
@@ -134,6 +157,7 @@ class UserResource(ModelResource):
         serializer = default_serialization()
         authorization= default_authorization()
         authentication = default_authentication()
+        always_return_data = True
 
     def obj_create(self, bundle, **kwargs):
         return super(UserResource, self).obj_create(bundle)
@@ -159,6 +183,7 @@ class MembershipResource(ModelResource):
         serializer = default_serialization()
         authorization= default_authorization()
         authentication = default_authentication()
+        always_return_data = True
 
     def obj_create(self, bundle, request=None, **kwargs):
         return super(MembershipResource, self).obj_create(bundle,user=bundle.request.user)
@@ -180,6 +205,7 @@ class CourseResource(ModelResource):
         serializer = default_serialization()
         authorization= default_authorization()
         authentication = default_authentication()
+        always_return_data = True
 
     def obj_create(self, bundle, **kwargs):
         return super(CourseResource, self).obj_create(bundle, user=bundle.request.user)
@@ -200,6 +226,7 @@ class ProblemResource(ModelResource):
         serializer = default_serialization()
         authorization= default_authorization()
         authentication = default_authentication()
+        always_return_data = True
 
     def obj_create(self, bundle, **kwargs):
         return super(ProblemResource, self).obj_create(bundle)
@@ -221,6 +248,7 @@ class EssayResource(ModelResource):
         serializer = default_serialization()
         authorization= default_authorization()
         authentication = default_authentication()
+        always_return_data = True
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(EssayResource, self).obj_create(bundle, user=bundle.request.user)
@@ -243,6 +271,7 @@ class EssayGradeResource(ModelResource):
         serializer = default_serialization()
         authorization= default_authorization()
         authentication = default_authentication()
+        always_return_data = True
 
     def obj_create(self, bundle, **kwargs):
         bundle = super(EssayGradeResource, self).obj_create(bundle, user=bundle.request.user)
@@ -270,3 +299,4 @@ def add_membership(user,organization):
     else:
         membership.role = UserRoles.student
     membership.save()
+

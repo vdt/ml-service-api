@@ -160,9 +160,9 @@ def pre_delete_user(sender,instance,**kwargs):
     """
     Removes the user's profile and removes foreign key relations from objects
     """
-    user_profile = user.profile
-    essays = user.essay_set.all()
-    essay_grades = user.essaygrade_set.all()
+    user_profile = instance.profile
+    essays = instance.essay_set.all()
+    essay_grades = instance.essaygrade_set.all()
     user_profile.delete()
     essays.update(user=None)
     essay_grades.update(user=None)
