@@ -20,25 +20,25 @@ def index(request):
     return render_to_response("index.html",RequestContext(request))
 
 def userprofile(request):
-    pass
+    return render_to_response("models/userprofile.html", RequestContext(request))
 
 def course(request):
-    return render_to_response("course/course.html", RequestContext(request))
+    return render_to_response("models/course.html", RequestContext(request))
 
 def problem(request):
-    pass
+    return render_to_response("models/problem.html", RequestContext(request))
 
 def organization(request):
-    pass
+    return render_to_response("models/organization.html", RequestContext(request))
 
 def essay(request):
-    pass
+    return render_to_response("models/essay.html", RequestContext(request))
 
 def essaygrade(request):
-    pass
+    return render_to_response("models/essaygrade.html", RequestContext(request))
 
 def user(request):
-    pass
+    return render_to_response("models/user.html", RequestContext(request))
 
 def membership(request):
-    pass
+    return render_to_response("models/membership.html", RequestContext(request))

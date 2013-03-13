@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block additional_js %}
+    {% load compressed %}
+    {% compressed_js 'course' %}
+{% endblock %}
 {% block content %}
     <section class="course-view">
         {%  verbatim %}

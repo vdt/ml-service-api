@@ -23,7 +23,7 @@ USE_S3_TO_STORE_MODELS= False #Determines whether or not models are placed in Am
 S3_BUCKETNAME="OpenEnded"
 TIME_BEFORE_REMOVING_STARTED_MODEL = 10 * 60 * 60 # in seconds, time before removing an ml model that was started (assume it wont finish)
 
-LOGIN_REDIRECT_URL = "/essay_site/api/v1/?format=json"
+LOGIN_REDIRECT_URL = "/frontend/"
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -112,15 +112,18 @@ PIPELINE_JS = {
             'js/jquery.cookie.js',
             ],
         'output_filename': 'js/util.js',
-    },
-    'course' : {
-        'source_filenames': [
-            'js/views/course.js'
-            ],
-        'output_filename': 'js/course.js',
-    },
-
+    }
 }
+
+API_MODELS = ["userprofile", "user", "membership", "course", "organization", "problem", "essay", "essaygrade"]
+
+for model in API_MODELS:
+    PIPELINE_JS[model] = {
+        'source_filenames': [
+            'js/views/{0}.js'.format(model)
+        ],
+        'output_filename': 'js/{0}.js'.format(model),
+    }
 
 PIPELINE_CSS = {
     'skeleton': {

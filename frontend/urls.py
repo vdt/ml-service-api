@@ -13,6 +13,7 @@ urlpatterns +=patterns('frontend.views',
     url(r'^essaygrade/$','essaygrade'),
     url(r'^membership/$','membership'),
     url(r'^userprofile/$','userprofile'),
+    url(r'^organization/$','organization'),
     url(r'^register/$','register'),
     url(r'^$','index'),
 )

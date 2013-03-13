@@ -3,10 +3,9 @@
     <head>
         {% load compressed %}
         {% compressed_css 'skeleton' %}
+        {% compressed_js 'util' %}
         {% block additional_js %}
         {% endblock %}
-        {% compressed_js 'util' %}
-        {% compressed_js 'course' %}
         <title>ML API</title>
         <meta name="csrf-token" content="{{csrf_token}}">
     </head>
@@ -49,7 +48,9 @@
                     <a href="/frontend/course">Course</a>
                     <a href="/frontend/problem">Problem</a>
                     <a href="/frontend/essay">Essay</a>
-                    <a href="/frontend/essaygrade">EssayGrade</a>
+                    <a href="/frontend/essaygrade">Essay Grade</a>
+                    <a href="/frontend/user">User</a>
+                    <a href="/frontend/userprofile">User Profile</a>
                     <a href="/frontend/membership">Membership</a>
                     Logged in as {{ user.username }}
                     <a href="/frontend/logout">Logout</a>
