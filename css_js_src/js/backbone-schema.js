@@ -32,14 +32,14 @@ var PaginatedCollection = Backbone.Collection.extend({
         return resp.objects;
     },
     url: function() {
-        var url = Backbone.Collection.prototype.initialize.apply(this, arguments);
+        var url = Backbone.Collection.prototype.url.call(this, arguments);
         console.log(url)
         urlparams = {offset: this.offset, limit: this.limit};
         urlparams = $.extend(urlparams, this.filter_options);
         if (this.sort_field) {
             urlparams = $.extend(urlparams, {sort_by: this.sort_field});
         }
-        return this.urlRoot + '?' + $.param(urlparams);
+        return url + '?' + $.param(urlparams);
     },
     pageInfo: function() {
         var info = {
@@ -159,6 +159,7 @@ var PaginatedView = Backbone.View.extend({
                     this.total = this.meta.total_count;
                     this.offset = this.meta.offset;
                     this.limit = this.meta.limit;
+                    console.log(this.offset);
                     var info = {
                         total: this.total,
                         offset: this.offset,
@@ -187,18 +188,31 @@ var PaginatedView = Backbone.View.extend({
                     return info;
                 },
                 nextPage: function() {
-                    if (!this.pageInfo().next) {
+                    var page_info = this.pageInfo();
+                    if (!page_info.next) {
                         return false;
                     }
                     this.offset = this.offset + this.limit;
                     return this.fetch();
                 },
                 previousPage: function() {
-                    if (!this.pageInfo().prev) {
+                    var page_info = this.pageInfo();
+                    if (!page_info.prev) {
                         return false;
                     }
                     this.offset = (this.offset - this.limit) || 0;
                     return this.fetch();
+                },
+                url: function() {
+                    var url = Backbone.Collection.prototype.url.call(this, arguments);
+
+                    urlparams = {offset: this.offset, limit: this.limit, format: "json"};
+                    urlparams = $.extend(urlparams, this.filter_options);
+                    if (this.sort_field) {
+                        urlparams = $.extend(urlparams, {sort_by: this.sort_field});
+                    }
+                    var full_url = url + '?' + $.param(urlparams)
+                    return full_url;
                 }
             });
         }

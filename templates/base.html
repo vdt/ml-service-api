@@ -23,16 +23,17 @@
         <script type="text/template" id="pagination-template">
             <% if(pages > 1) { %>
                 <% if(prev) { %>
-                    <a href="#" class="prev">previous</a>
+                    <span>previous</span>
+                    <!-- <a href="#" id="prev">previous</a> -->
                 <% } else { %>
-                    <span>Previous</span>
+                    <span>previous</span>
                 <% } %>
                 <%= range[0] %>..<%= range[1] %> of <%= total %>
 
                 <% if(next) { %>
-                    <a href="#" class="next">next</a>
+                    <a href="#" id="next">next</a>
                 <% } else { %>
-                    <span>Next</span>
+                    <span>next</span>
                 <% } %>
             <% } %>
         </script>

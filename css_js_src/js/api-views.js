@@ -8,13 +8,12 @@ ListView = Backbone.View.extend({
     events: {
         "click #add": "addItemForm",
         "click #save-new-item": "saveItem",
-        'click a.prev': 'previous',
-        'click a.next': 'next'
+        'click a#prev': 'previous',
+        'click a#next': 'next'
     },
     initialize: function(){
         _.bindAll(this, "renderItem", "loadResults", "addItemForm", "saveItem", "previous", "next", "render");
         this.itemList = new this.collection;
-        //this.itemList.bind('reset', this.render);
     },
 
     renderItem: function(model){
@@ -30,8 +29,6 @@ ListView = Backbone.View.extend({
 
     loadResults: function () {
         var that = this;
-        // we are starting a new load of results so set isLoading to true
-        this.isLoading = true;
         // fetch is Backbone.js native function for calling and parsing the collection url
         this.itemList.fetch({
             success: function (items) {
@@ -77,13 +74,15 @@ ListView = Backbone.View.extend({
         $(this.el).data('adding', false);
     },
     previous: function() {
-        this.collection.previousPage();
-        return false;
+        this.itemList.previousPage();
+        this.render();
     },
-
     next: function() {
-        this.collection.nextPage();
-        return false;
+        this.itemList.nextPage();
+        this.render();
+    },
+    remove_data: function(){
+        $(this.el).empty();
     }
 });
 
