@@ -9,7 +9,7 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             new_user = form.save()
-            return HttpResponseRedirect("/essay_site/api/v1/?format=json")
+            return HttpResponseRedirect("/frontend/")
     else:
         form = UserCreationForm()
     return render_to_response("registration/register.html", RequestContext(request,{
