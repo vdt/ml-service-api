@@ -44,28 +44,32 @@ ListView = Backbone.View.extend({
     addItemForm : function() {
         fields = {};
         var that = this;
-        console.log(this.courseList.schema);
-        $.getJSON(this.courseList.schema , function(data){
-            for (var field in data['fields']){
-                if(DO_NOT_SHOW.indexOf(field)==-1)
-                {
-                    fields[field] = "";
+        if($(this.el).data('adding')==false){
+            $.getJSON(this.courseList.schema , function(data){
+                for (var field in data['fields']){
+                    if(DO_NOT_SHOW.indexOf(field)==-1)
+                    {
+                        fields[field] = "";
+                    }
                 }
-            }
-            console.log(data);
-            var update_template = $('#generic-item-add-template');
-            var update_html = (_.template(update_template.html(), {item: fields, _:_}));
-            $(that.el).append(update_html)
-            $(that.el).data('adding', true)
-        });
+                console.log(data);
+                var update_template = $('#generic-item-add-template');
+                var update_html = (_.template(update_template.html(), {item: fields, _:_}));
+                $(that.el).prepend(update_html);
+                $(that.el).data('adding', true);
+            });
+        } else {
+            $(this.el).children("#item-add").remove();
+            $(this.el).data('adding', false);
+        }
     },
     saveItem: function() {
         var update_elements = $(this.el).children('#item-add').children('.new-item');
         var new_item = new this.item;
         new_item.add(update_elements);
         this.courseList.add(new_item);
-        $(this.el).children("#item-add").remove()
-        $(this.el).data('adding', false)
+        $(this.el).children("#item-add").remove();
+        $(this.el).data('adding', false);
     }
 });
 
