@@ -457,7 +457,12 @@
         // Ensure attributes are restored during synchronous saves.
         model.attributes = attributes;
         var serverAttrs = model.parse(resp, options);
-        if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
+        try{
+            if (options.wait) serverAttrs = _.extend(attrs || {}, serverAttrs);
+        } catch(err)
+        {
+            serverAttrs = _.extend(attrs || {}, serverAttrs);
+        }
         if (_.isObject(serverAttrs) && !model.set(serverAttrs, options)) {
           return false;
         }

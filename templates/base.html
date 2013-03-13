@@ -20,6 +20,22 @@
                 <a href="#" id="save-new-item" class="button">Save</a>
             </div>
         </script>
+        <script type="text/template" id="pagination-template">
+            <% if(pages > 1) { %>
+                <% if(prev) { %>
+                    <a href="#" class="prev">previous</a>
+                <% } else { %>
+                    <span>Previous</span>
+                <% } %>
+                <%= range[0] %>..<%= range[1] %> of <%= total %>
+
+                <% if(next) { %>
+                    <a href="#" class="next">next</a>
+                <% } else { %>
+                    <span>Next</span>
+                <% } %>
+            <% } %>
+        </script>
      {% endverbatim %}
     <div class="container">
         <div class="navbar sixteen columns">

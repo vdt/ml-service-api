@@ -7,11 +7,14 @@ ListView = Backbone.View.extend({
     item: undefined,
     events: {
         "click #add": "addItemForm",
-        "click #save-new-item": "saveItem"
+        "click #save-new-item": "saveItem",
+        'click a.prev': 'previous',
+        'click a.next': 'next'
     },
     initialize: function(){
-        _.bindAll(this, "renderItem", "loadResults", "addItemForm", "saveItem");
+        _.bindAll(this, "renderItem", "loadResults", "addItemForm", "saveItem", "previous", "next", "render");
         this.itemList = new this.collection;
+        //this.itemList.bind('reset', this.render);
     },
 
     renderItem: function(model){
@@ -23,6 +26,9 @@ ListView = Backbone.View.extend({
     render: function(){
         this.loadResults();
         $(this.el).data('adding', false)
+        var pagination_template = $('#pagination-template');
+        var update_html = (_.template(pagination_template.html(), this.itemList.pageInfo()));
+        $(this.el).append(update_html);
     },
 
     loadResults: function () {
@@ -69,6 +75,15 @@ ListView = Backbone.View.extend({
         this.itemList.add(new_item);
         $(this.el).children("#item-add").remove();
         $(this.el).data('adding', false);
+    },
+    previous: function() {
+        this.collection.previousPage();
+        return false;
+    },
+
+    next: function() {
+        this.collection.nextPage();
+        return false;
     }
 });
 
@@ -140,7 +155,10 @@ ItemView = Backbone.View.extend({
     add: function(update_elements) {
         var update_dict = this.update_base(update_elements);
         this.model = new this.modeltype;
-        this.model.save(update_dict,{});
+        this.model.save(update_dict,{
+            success: function() {},
+            wait: false
+        });
     },
     delete: function () {
         $(this.el).remove()
