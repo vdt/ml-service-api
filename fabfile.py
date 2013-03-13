@@ -117,9 +117,9 @@ def deploy():
             sudo('chown -R www-data {0}'.format(up_one_level_dir))
 
         with cd(ml_code_dir):
-            sudo('xargs -a install/apt-packages.txt apt-get install')
-            run('pip install -r install/pre-requirements.txt')
-            run('pip install -r install/requirements.txt')
+            sudo('xargs -a apt-packages.txt apt-get install')
+            run('pip install -r pre-requirements.txt')
+            run('pip install -r requirements.txt')
 
     with lcd(local_dir), settings(warn_only=True):
         with cd(up_one_level_dir):
