@@ -156,6 +156,9 @@ var PaginatedView = Backbone.View.extend({
                 limit : 20,
                 offset : 0,
                 pageInfo: function() {
+                    this.total = this.meta.total_count;
+                    this.offset = this.meta.offset;
+                    this.limit = this.meta.limit;
                     var info = {
                         total: this.total,
                         offset: this.offset,

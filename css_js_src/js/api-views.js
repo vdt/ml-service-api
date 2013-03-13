@@ -26,9 +26,6 @@ ListView = Backbone.View.extend({
     render: function(){
         this.loadResults();
         $(this.el).data('adding', false)
-        var pagination_template = $('#pagination-template');
-        var update_html = (_.template(pagination_template.html(), this.itemList.pageInfo()));
-        $(this.el).append(update_html);
     },
 
     loadResults: function () {
@@ -43,6 +40,9 @@ ListView = Backbone.View.extend({
                 {
                     that.renderItem(items.models[model])
                 }
+                var pagination_template = $('#pagination-template');
+                var update_html = (_.template(pagination_template.html(), that.itemList.pageInfo()));
+                $(that.el).append(update_html);
             }
         });
     },
