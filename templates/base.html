@@ -2,10 +2,7 @@
 <html>
     <head>
         {% load compressed %}
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
         {% compressed_css 'skeleton' %}
-        {% compressed_css 'base' %}
-        {% compressed_css 'layout' %}
         {% block additional_js %}
         {% endblock %}
         {% compressed_js 'util' %}

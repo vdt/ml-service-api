@@ -115,7 +115,6 @@ PIPELINE_JS = {
     },
     'course' : {
         'source_filenames': [
-            'js/models/course.js',
             'js/views/course.js'
             ],
         'output_filename': 'js/course.js',
@@ -124,23 +123,13 @@ PIPELINE_JS = {
 }
 
 PIPELINE_CSS = {
-    'blueprint_ie': {
+    'skeleton': {
         'source_filenames': [
             'css/skeleton.css',
-            ],
-        'output_filename': 'css/skeleton.css',
-        },
-    'blueprint_print': {
-        'source_filenames': [
             'css/base.css',
-            ],
-        'output_filename': 'css/layout.css',
-        },
-    'blueprint_screen': {
-        'source_filenames': [
             'css/layout.css',
             ],
-        'output_filename': 'css/base.css',
+        'output_filename': 'css/skeleton.css',
         },
 }
 
