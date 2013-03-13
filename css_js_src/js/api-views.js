@@ -47,7 +47,7 @@ ListView = Backbone.View.extend({
         console.log(this.courseList.schema);
         $.getJSON(this.courseList.schema , function(data){
             for (var field in data['fields']){
-                if(DO_NOT_SHOW.indexOf(field)==0)
+                if(DO_NOT_SHOW.indexOf(field)==-1)
                 {
                     fields[field] = "";
                 }
@@ -117,7 +117,7 @@ ItemView = Backbone.View.extend({
             {
 
             }
-            if(id!="" && value!="" && DO_NOT_SHOW.indexOf(id)==0)
+            if(id!="" && value!="" && DO_NOT_SHOW.indexOf(id)==-1)
             {
                 update_dict[id] = value;
             }
