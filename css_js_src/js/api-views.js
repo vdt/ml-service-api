@@ -1,3 +1,5 @@
+var DO_NOT_SHOW = ["modified", "created", "resource_uri", "id"];
+
 ListView = Backbone.View.extend({
     tagName: "ul",
     el: '.list-view',
@@ -45,7 +47,10 @@ ListView = Backbone.View.extend({
         console.log(this.courseList.schema);
         $.getJSON(this.courseList.schema , function(data){
             for (var field in data['fields']){
-                fields[field] = ""
+                if(DO_NOT_SHOW.indexOf(field)==0)
+                {
+                    fields[field] = "";
+                }
             }
             console.log(data);
             var update_template = $('#generic-item-add-template');
@@ -112,7 +117,7 @@ ItemView = Backbone.View.extend({
             {
 
             }
-            if(id!="id" && id!="" && value!="" && id!="modified" && id!="created" && id!="resource_uri")
+            if(id!="" && value!="" && DO_NOT_SHOW.indexOf(id)==0)
             {
                 update_dict[id] = value;
             }
