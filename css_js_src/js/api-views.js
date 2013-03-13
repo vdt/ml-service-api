@@ -75,14 +75,16 @@ ListView = Backbone.View.extend({
     },
     previous: function() {
         this.itemList.previousPage();
+        this.remove_data();
         this.render();
     },
     next: function() {
         this.itemList.nextPage();
+        this.remove_data();
         this.render();
     },
     remove_data: function(){
-        $(this.el).empty();
+        $(this.el).children("#page-nav").remove();
     }
 });
 

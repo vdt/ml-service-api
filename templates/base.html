@@ -21,21 +21,23 @@
             </div>
         </script>
         <script type="text/template" id="pagination-template">
-            <% if(pages > 1) { %>
-                <% if(prev) { %>
-                    <span>previous</span>
-                    <!-- <a href="#" id="prev">previous</a> -->
-                <% } else { %>
-                    <span>previous</span>
-                <% } %>
-                <%= range[0] %>..<%= range[1] %> of <%= total %>
+            <div id="page-nav">
+                <% if(pages > 1) { %>
+                    <% if(prev) { %>
+                        <span>previous</span>
+                        <!-- <a href="#" id="prev">previous</a> -->
+                    <% } else { %>
+                        <span>previous</span>
+                    <% } %>
+                    <%= range[0] %>..<%= range[1] %> of <%= total %>
 
-                <% if(next) { %>
-                    <a href="#" id="next">next</a>
-                <% } else { %>
-                    <span>next</span>
+                    <% if(next) { %>
+                        <a href="#" id="next">next</a>
+                    <% } else { %>
+                        <span>next</span>
+                    <% } %>
                 <% } %>
-            <% } %>
+            </div>
         </script>
      {% endverbatim %}
     <div class="container">
