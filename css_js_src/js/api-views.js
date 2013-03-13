@@ -11,13 +11,13 @@ ListView = Backbone.View.extend({
     },
     initialize: function(){
         _.bindAll(this, "renderItem", "loadResults", "addItemForm", "saveItem");
-        this.courseList = new this.collection;
+        this.itemList = new this.collection;
     },
 
     renderItem: function(model){
-        var courseItemView = new this.item({model: model});
-        courseItemView.render();
-        $(this.el).append(courseItemView.el);
+        var allItemView = new this.item({model: model});
+        allItemView.render();
+        $(this.el).append(allItemView.el);
     },
 
     render: function(){
@@ -30,13 +30,12 @@ ListView = Backbone.View.extend({
         // we are starting a new load of results so set isLoading to true
         this.isLoading = true;
         // fetch is Backbone.js native function for calling and parsing the collection url
-        this.courseList.fetch({
-            success: function (courses) {
+        this.itemList.fetch({
+            success: function (items) {
                 // Once the results are returned lets populate our template
-                console.log(courses.models);
-                for(model in courses.models)
+                for(model in items.models)
                 {
-                    that.renderItem(courses.models[model])
+                    that.renderItem(items.models[model])
                 }
             }
         });
@@ -45,7 +44,7 @@ ListView = Backbone.View.extend({
         fields = {};
         var that = this;
         if($(this.el).data('adding')==false){
-            $.getJSON(this.courseList.schema , function(data){
+            $.getJSON(this.itemList.schema , function(data){
                 for (var field in data['fields']){
                     if(DO_NOT_SHOW.indexOf(field)==-1)
                     {
@@ -67,7 +66,7 @@ ListView = Backbone.View.extend({
         var update_elements = $(this.el).children('#item-add').children('.new-item');
         var new_item = new this.item;
         new_item.add(update_elements);
-        this.courseList.add(new_item);
+        this.itemList.add(new_item);
         $(this.el).children("#item-add").remove();
         $(this.el).data('adding', false);
     }
@@ -96,9 +95,9 @@ ItemView = Backbone.View.extend({
             $(this.el).data('detail', false)
         } else {
             var item_template = $('#' + this.templatename + '-item-detail-template');
-            var html = (_.template(item_template.html(), {course: this.model, _:_}));
+            var html = (_.template(item_template.html(), {item: this.model, _:_}));
             var update_template = $('#' + this.templatename + '-item-add-template');
-            var update_html = (_.template(update_template.html(), {course: this.model.toJSON(), _:_}));
+            var update_html = (_.template(update_template.html(), {item: this.model.toJSON(), _:_}));
             $(this.el).append(html);
             $(this.el).append(update_html)
             $(this.el).data('detail', true)
@@ -107,7 +106,7 @@ ItemView = Backbone.View.extend({
 
     render: function(){
         var item_template = $('#'+ this.templatename + '-item-template');
-        var html = (_.template(item_template.html(), {course: this.model, _:_}));
+        var html = (_.template(item_template.html(), {item: this.model, _:_}));
         $(this.el).append(html);
         $(this.el).data('detail', false)
     },
