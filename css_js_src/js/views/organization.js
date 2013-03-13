@@ -1,7 +1,8 @@
 waitForSchema(function() {
 
     OrganizationItemView = ItemView.extend({
-        templatename : "organization"
+        templatename : "organization",
+        modeltype: Organization
     });
 
     OrganizationListView = ListView.extend({

@@ -60,6 +60,10 @@ ListView = Backbone.View.extend({
         });
     },
     saveItem: function() {
+        var update_elements = $(this.el).children('#item-add').children('.new-item');
+        var new_item = new this.item;
+        new_item.add(update_elements);
+        this.courseList.add(new_item);
         $(this.el).children("#item-add").remove()
         $(this.el).data('adding', false)
     }
@@ -68,6 +72,7 @@ ListView = Backbone.View.extend({
 ItemView = Backbone.View.extend({
     tagName: "li",
     templatename : "item",
+    modeltype: undefined,
     events: {
         "click a#show": "clicked",
         "click #update": "update",
@@ -102,9 +107,14 @@ ItemView = Backbone.View.extend({
         $(this.el).append(html);
         $(this.el).data('detail', false)
     },
-
     update: function() {
         var update_elements = $(this.el).children('#item-add').children('.update');
+        var update_dict = this.update_base(update_elements)
+        this.model.save(update_dict, {patch: updating});
+        $(this.el).children().remove();
+        this.render();
+    },
+    update_base: function(update_elements) {
         var update_dict = {};
         for(var el in update_elements)
         {
@@ -122,11 +132,13 @@ ItemView = Backbone.View.extend({
                 update_dict[id] = value;
             }
         }
-        this.model.save(update_dict, {patch: true});
-        $(this.el).children().remove();
-        this.render();
+        return update_dict;
     },
-
+    add: function(update_elements) {
+        var update_dict = this.update_base(update_elements);
+        this.model = new this.modeltype;
+        this.model.save(update_dict,{});
+    },
     delete: function () {
         $(this.el).remove()
         this.model.destroy();
