@@ -3,6 +3,8 @@ from django.contrib.auth.models import User, Group, Permission
 from tastypie.models import create_api_key
 import json
 from django.db.models.signals import pre_delete, pre_save, post_save, post_delete
+from request_provider.signals import get_request
+from guardian.shortcuts import assign_perm
 
 #CLASSES THAT WRAP CONSTANTS
 
@@ -21,6 +23,9 @@ class GraderTypes():
     machine = "ML"
     instructor = "IN"
     peer = "PE"
+
+PERMISSIONS = ["view", "add", "delete", "change"]
+PERMISSION_MODELS = ["organization", "membership", "userprofile", "course", "problem", "essay", "essaygrade"]
 
 #MODELS
 
@@ -246,12 +251,20 @@ def get_group_name(membership):
     group_name = "{0}_{1}".format(membership.organization.id,membership.role)
     return group_name
 
+def add_creator_permissions(sender, instance, **kwargs):
+    user = get_request().user
+    instance_name = instance.__class__.__name__.lower()
+    if instance_name in PERMISSION_MODELS:
+        for perm in PERMISSIONS:
+            assign_perm('{0}_{1}'.format(perm, instance_name), user, instance)
+
 #Django signals called after models are handled
 pre_save.connect(remove_user_from_groups, sender=Membership)
 
 post_save.connect(create_user_profile, sender=User)
 post_save.connect(create_api_key, sender=User)
 post_save.connect(add_user_to_groups, sender=Membership)
+post_save.connect(add_creator_permissions)
 
 pre_delete.connect(pre_delete_problem,sender=Problem)
 pre_delete.connect(pre_delete_essay,sender=Essay)
