@@ -43,9 +43,6 @@ class Organization(models.Model):
     class Meta:
         permissions = (
             ("view_organization", "Can view organization"),
-            ("add_organization", "Can add organization"),
-            ("delete_organization", "Can delete organization"),
-            ("change_organization", "Can change organization"),
         )
 
 class Membership(models.Model):
@@ -56,9 +53,6 @@ class Membership(models.Model):
     class Meta:
         permissions = (
             ("view_membership", "Can view membership"),
-            ("add_membership", "Can add membership"),
-            ("delete_membership", "Can delete membership"),
-            ("change_membership", "Can change membership"),
         )
 
 class UserProfile(models.Model):
@@ -77,9 +71,6 @@ class UserProfile(models.Model):
     class Meta:
         permissions = (
             ("view_userprofile", "Can view userprofile"),
-            ("add_userprofile", "Can add userprofile"),
-            ("delete_userprofile", "Can delete userprofile"),
-            ("change_userprofile", "Can change userprofile"),
         )
 
 class Course(models.Model):
@@ -96,9 +87,6 @@ class Course(models.Model):
     class Meta:
         permissions = (
             ("view_course", "Can view course"),
-            ("add_course", "Can add course"),
-            ("delete_course", "Can delete course"),
-            ("change_course", "Can change course"),
         )
 
 class Problem(models.Model):
@@ -120,9 +108,6 @@ class Problem(models.Model):
     class Meta:
         permissions = (
             ("view_problem", "Can view problem"),
-            ("add_problem", "Can add problem"),
-            ("delete_problem", "Can delete problem"),
-            ("change_problem", "Can change problem"),
         )
 
 class Essay(models.Model):
@@ -130,6 +115,8 @@ class Essay(models.Model):
     problem = models.ForeignKey(Problem)
     #Each essay is written by a specified user
     user = models.ForeignKey(User, null=True)
+    #Each essay is associated with an organization
+    organization = models.ForeignKey(Organization, null=True)
     #Each user writes text (their essay)
     essay_text = models.TextField()
     #Schools may wish to send additional predictors (student grade level, etc)
@@ -147,9 +134,6 @@ class Essay(models.Model):
     class Meta:
         permissions = (
             ("view_essay", "Can view essay"),
-            ("add_essay", "Can add essay"),
-            ("delete_essay", "Can delete essay"),
-            ("change_essay", "Can change essay"),
         )
 
 class EssayGrade(models.Model):
@@ -178,9 +162,6 @@ class EssayGrade(models.Model):
     class Meta:
         permissions = (
             ("view_essaygrade", "Can view essaygrade"),
-            ("add_essaygrade", "Can add essaygrade"),
-            ("delete_essaygrade", "Can delete essaygrade"),
-            ("change_essaygrade", "Can change essaygrade"),
         )
 
 
@@ -252,11 +233,14 @@ def get_group_name(membership):
     return group_name
 
 def add_creator_permissions(sender, instance, **kwargs):
-    user = get_request().user
-    instance_name = instance.__class__.__name__.lower()
-    if instance_name in PERMISSION_MODELS:
-        for perm in PERMISSIONS:
-            assign_perm('{0}_{1}'.format(perm, instance_name), user, instance)
+    try:
+        user = get_request().user
+        instance_name = instance.__class__.__name__.lower()
+        if instance_name in PERMISSION_MODELS:
+            for perm in PERMISSIONS:
+                assign_perm('{0}_{1}'.format(perm, instance_name), user, instance)
+    except:
+        pass
 
 #Django signals called after models are handled
 pre_save.connect(remove_user_from_groups, sender=Membership)
