@@ -181,7 +181,15 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'request_provider.middleware.RequestProvider',
 )
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'guardian.backends.ObjectPermissionBackend',
+)
+
+ANONYMOUS_USER_ID = -1
 
 ROOT_URLCONF = 'ml_service_api.urls'
 
@@ -212,7 +220,8 @@ INSTALLED_APPS = (
     'south',
     'ml_grading',
     'djcelery',
-    'pipeline'
+    'pipeline',
+    'guardian',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -3,6 +3,10 @@ from django.contrib.auth.models import User, Group, Permission
 from tastypie.models import create_api_key
 import json
 from django.db.models.signals import pre_delete, pre_save, post_save, post_delete
+from request_provider.signals import get_request
+from guardian.shortcuts import assign_perm
+import logging
+log=logging.getLogger(__name__)
 
 #CLASSES THAT WRAP CONSTANTS
 
@@ -22,6 +26,9 @@ class GraderTypes():
     instructor = "IN"
     peer = "PE"
 
+PERMISSIONS = ["view", "add", "delete", "change"]
+PERMISSION_MODELS = ["organization", "membership", "userprofile", "course", "problem", "essay", "essaygrade"]
+
 #MODELS
 
 class Organization(models.Model):
@@ -35,10 +42,20 @@ class Organization(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        permissions = (
+            ("view_organization", "Can view organization"),
+        )
+
 class Membership(models.Model):
     role = models.CharField(max_length=20, default=UserRoles.student)
     organization = models.ForeignKey(Organization)
     user = models.ForeignKey(User)
+
+    class Meta:
+        permissions = (
+            ("view_membership", "Can view membership"),
+        )
 
 class UserProfile(models.Model):
     #TODO: Add in a callback where if user identifies as "administrator", then they can create an organization
@@ -53,6 +70,11 @@ class UserProfile(models.Model):
     created = models.DateTimeField(auto_now_add=True,blank=True, null=True)
     modified = models.DateTimeField(auto_now=True, blank=True, null=True)
 
+    class Meta:
+        permissions = (
+            ("view_userprofile", "Can view userprofile"),
+        )
+
 class Course(models.Model):
     #A user can have many courses, and a course can have many users
     users = models.ManyToManyField(User)
@@ -63,6 +85,11 @@ class Course(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        permissions = (
+            ("view_course", "Can view course"),
+        )
 
 class Problem(models.Model):
     #A course has many problems, and a problem can be used in many courses
@@ -80,11 +107,18 @@ class Problem(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        permissions = (
+            ("view_problem", "Can view problem"),
+        )
+
 class Essay(models.Model):
     #Each essay is written for a specific problem
     problem = models.ForeignKey(Problem)
     #Each essay is written by a specified user
     user = models.ForeignKey(User, null=True)
+    #Each essay is associated with an organization
+    organization = models.ForeignKey(Organization, null=True)
     #Each user writes text (their essay)
     essay_text = models.TextField()
     #Schools may wish to send additional predictors (student grade level, etc)
@@ -98,6 +132,11 @@ class Essay(models.Model):
 
     def get_instructor_scored(self):
         return self.essaygrade_set.filter(grader_type=GraderTypes.instructor).order_by("-modified")[:1]
+
+    class Meta:
+        permissions = (
+            ("view_essay", "Can view essay"),
+        )
 
 class EssayGrade(models.Model):
     #Each essaygrade is for a specific essay
@@ -121,6 +160,11 @@ class EssayGrade(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        permissions = (
+            ("view_essaygrade", "Can view essaygrade"),
+        )
 
 
 #MODEL SIGNAL CALLBACKS
@@ -190,12 +234,29 @@ def get_group_name(membership):
     group_name = "{0}_{1}".format(membership.organization.id,membership.role)
     return group_name
 
+def add_creator_permissions(sender, instance, **kwargs):
+    try:
+        instance_name = instance.__class__.__name__.lower()
+        log.debug(instance_name)
+        if instance_name=="user":
+            user = instance
+        elif instance_name=="userprofile":
+            user=instance.user
+        else:
+            user = get_request().user
+        if instance_name in PERMISSION_MODELS:
+            for perm in PERMISSIONS:
+                assign_perm('{0}_{1}'.format(perm, instance_name), user, instance)
+    except:
+        pass
+
 #Django signals called after models are handled
 pre_save.connect(remove_user_from_groups, sender=Membership)
 
 post_save.connect(create_user_profile, sender=User)
 post_save.connect(create_api_key, sender=User)
 post_save.connect(add_user_to_groups, sender=Membership)
+post_save.connect(add_creator_permissions)
 
 pre_delete.connect(pre_delete_problem,sender=Problem)
 pre_delete.connect(pre_delete_essay,sender=Essay)

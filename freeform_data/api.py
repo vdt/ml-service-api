@@ -12,6 +12,7 @@ from django.db.models import Q
 from tastypie.serializers import Serializer
 from django.db import IntegrityError
 from tastypie.exceptions import BadRequest
+from guardian_auth import GuardianAuthorization
 import logging
 
 log=logging.getLogger(__name__)
@@ -38,7 +39,7 @@ def default_authorization():
     """
     Used to ensure that changing authorization can be done on a sitewide level easily.
     """
-    return Authorization()
+    return GuardianAuthorization()
 
 def default_authentication():
     """
@@ -80,6 +81,7 @@ class OrganizationResource(ModelResource):
     Preserves appropriate many to many relationships, and encapsulates the Organization model.
     """
     courses = fields.ToManyField('freeform_data.api.CourseResource', 'course_set', null=True)
+    essays = fields.ToManyField('freeform_data.api.EssayResource', 'essay_set', null=True)
     #This maps the organization users to the users model via membership
     user_query = lambda bundle: bundle.obj.users.through.objects.all() or bundle.obj.users
     users = fields.ToManyField("freeform_data.api.MembershipResource", attribute=user_query, null=True)
@@ -137,9 +139,6 @@ class UserProfileResource(ModelResource):
     def obj_create(self, bundle, request=None, **kwargs):
         return super(UserProfileResource, self).obj_create(bundle,user=bundle.request.user)
 
-    def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(user_id=request.user.id)
-
 class UserResource(ModelResource):
     """
     Encapsulates the User Model
@@ -165,10 +164,6 @@ class UserResource(ModelResource):
     def dehydrate(self, bundle):
         bundle.data['api_key'] = bundle.obj.api_key.key
         return bundle
-
-    def apply_authorization_limits(self, request, object_list):
-        log.debug("Applying limits.")
-        return object_list.filter(user_id=request.user.id)
 
 class MembershipResource(ModelResource):
     """
@@ -240,6 +235,7 @@ class EssayResource(ModelResource):
     """
     essaygrades = fields.ToManyField('freeform_data.api.EssayGradeResource', 'essaygrade_set', null=True, related_name='essay')
     user = fields.ToOneField(UserResource, 'user', null=True)
+    organization = fields.ToOneField(OrganizationResource, 'organization', null=True)
     problem = fields.ToOneField(ProblemResource, 'problem')
     class Meta:
         queryset = Essay.objects.all()
