@@ -5,6 +5,8 @@ import json
 from django.db.models.signals import pre_delete, pre_save, post_save, post_delete
 from request_provider.signals import get_request
 from guardian.shortcuts import assign_perm
+import logging
+log=logging.getLogger(__name__)
 
 #CLASSES THAT WRAP CONSTANTS
 
@@ -234,8 +236,14 @@ def get_group_name(membership):
 
 def add_creator_permissions(sender, instance, **kwargs):
     try:
-        user = get_request().user
         instance_name = instance.__class__.__name__.lower()
+        log.debug(instance_name)
+        if instance_name=="user":
+            user = instance
+        elif instance_name=="userprofile":
+            user=instance.user
+        else:
+            user = get_request().user
         if instance_name in PERMISSION_MODELS:
             for perm in PERMISSIONS:
                 assign_perm('{0}_{1}'.format(perm, instance_name), user, instance)

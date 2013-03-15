@@ -3,7 +3,6 @@ from tastypie.exceptions import TastypieError, Unauthorized
 from guardian.core import ObjectPermissionChecker
 import logging
 logger = logging.getLogger(__name__)
-logger_debug = logging.getLogger(__name__)
 
 def check_permissions(permission_type,user,obj):
     checker = ObjectPermissionChecker(user)

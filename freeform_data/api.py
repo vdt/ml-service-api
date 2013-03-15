@@ -139,9 +139,6 @@ class UserProfileResource(ModelResource):
     def obj_create(self, bundle, request=None, **kwargs):
         return super(UserProfileResource, self).obj_create(bundle,user=bundle.request.user)
 
-    def apply_authorization_limits(self, request, object_list):
-        return object_list.filter(user_id=request.user.id)
-
 class UserResource(ModelResource):
     """
     Encapsulates the User Model
@@ -167,10 +164,6 @@ class UserResource(ModelResource):
     def dehydrate(self, bundle):
         bundle.data['api_key'] = bundle.obj.api_key.key
         return bundle
-
-    def apply_authorization_limits(self, request, object_list):
-        log.debug("Applying limits.")
-        return object_list.filter(user_id=request.user.id)
 
 class MembershipResource(ModelResource):
     """
