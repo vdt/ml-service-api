@@ -12,6 +12,7 @@ from django.db.models import Q
 from tastypie.serializers import Serializer
 from django.db import IntegrityError
 from tastypie.exceptions import BadRequest
+from guardian_auth import GuardianAuthorization
 import logging
 
 log=logging.getLogger(__name__)
@@ -38,7 +39,7 @@ def default_authorization():
     """
     Used to ensure that changing authorization can be done on a sitewide level easily.
     """
-    return DjangoAuthorization()
+    return GuardianAuthorization()
 
 def default_authentication():
     """

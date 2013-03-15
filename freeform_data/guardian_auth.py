@@ -43,9 +43,7 @@ class GuardianAuthorization(Authorization):
             if check_permissions("view", bundle.request.user, obj):
                 read_list.append(obj)
         # GET-style methods are always allowed.
-        if read_list:
-            return read_list
-        raise Unauthorized("You are not allowed to access that resource.")
+        return read_list
 
     def read_detail(self, object_list, bundle):
         klass = self.base_checks(bundle.request, bundle.obj.__class__)
@@ -59,9 +57,7 @@ class GuardianAuthorization(Authorization):
             if check_permissions("view", bundle.request.user, obj):
                 read_list.append(obj)
 
-        if read_list:
-            return True
-        raise Unauthorized("You are not allowed to access that resource.")
+        return True
 
     def create_list(self, object_list, bundle):
         klass = self.base_checks(bundle.request, object_list.model)
@@ -71,12 +67,10 @@ class GuardianAuthorization(Authorization):
             return []
 
         for obj in object_list:
-            if check_permissions("add", bundle.request.user, obj):
-                create_list.append(obj)
+            #if check_permissions("add", bundle.request.user, obj):
+            create_list.append(obj)
 
-        if create_list:
-            return create_list
-        raise Unauthorized("You are not allowed to access that resource.")
+        return create_list
 
     def create_detail(self, object_list, bundle):
         klass = self.base_checks(bundle.request, bundle.obj.__class__)
@@ -86,12 +80,10 @@ class GuardianAuthorization(Authorization):
             raise Unauthorized("You are not allowed to access that resource.")
 
         for obj in object_list:
-            if check_permissions("add", bundle.request.user, obj):
-                create_list.append(obj)
+            #if check_permissions("add", bundle.request.user, obj):
+            create_list.append(obj)
 
-        if create_list:
-            return True
-        raise Unauthorized("You are not allowed to access that resource.")
+        return True
 
     def update_list(self, object_list, bundle):
         klass = self.base_checks(bundle.request, object_list.model)
