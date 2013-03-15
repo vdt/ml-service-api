@@ -38,7 +38,7 @@ def default_authorization():
     """
     Used to ensure that changing authorization can be done on a sitewide level easily.
     """
-    return Authorization()
+    return DjangoAuthorization()
 
 def default_authentication():
     """
