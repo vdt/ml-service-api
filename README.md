@@ -1,6 +1,11 @@
 ML Service API
 ====================
 
+Questions?
+---------------------
+Feel free to open an issue in the issue tracker, or use the link http://www.hipchat.com/gBwxSJBHf to access a hipchat chat room for real time
+communication with some of the edX developers.
+
 Overview
 ---------------------
 This is an API wrapper for a service to grade arbitrary free text responses.
